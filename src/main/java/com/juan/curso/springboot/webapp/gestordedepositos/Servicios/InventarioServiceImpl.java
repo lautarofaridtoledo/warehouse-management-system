@@ -63,9 +63,14 @@ public class InventarioServiceImpl implements GenericService<Inventario, Long> {
         try{ inventarioRepositorio.deleteById(id); } catch (RuntimeException e) { throw new RuntimeException(e); }
     }
 
-    public List<Inventario> buscarInventariosPorIdProducto(Long idProducto) {
-        String sku = productoService.buscarPorId(idProducto).get().getCodigoSku();
-        return inventarioRepositorio.findAllByProducto_CodigoSku(sku);
+    public List<Inventario> buscarInventariosPorIdProducto(Long idProducto) throws RecursoNoEncontradoException{
+        try {
+            String sku = productoService.buscarPorId(idProducto).get().getCodigoSku();
+            return inventarioRepositorio.findAllByProducto_CodigoSku(sku);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public List<Inventario> buscarPorCodigoSku(String codigoSku) {

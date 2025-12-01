@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("GestorDeDepositos/detallesDeDespacho")
+@RequestMapping("GestorDeDepositos/detalles-despacho")
 public class DetalleDespachoController {
 
     private final DetalleDespachoServiceImpl detalleDespachoServiceImpl;
@@ -36,7 +36,7 @@ public class DetalleDespachoController {
         this.inventarioServiceImpl = inventarioServiceImpl;
     }
 
-    @GetMapping("/buscarTodos")
+    @GetMapping("/buscar")
     @Operation(summary = "Este metodo busca todos los deetalles de despachos guardados en la base de datos")
     public ResponseEntity<?> buscarTodos() {
         List<DetalleDespacho> detalles = detalleDespachoServiceImpl.buscarTodos()
@@ -49,9 +49,9 @@ public class DetalleDespachoController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping("/buscarPorId/{id}")
+    @GetMapping("/buscarPorId")
     @Operation(summary = "Este metodo busca un detalle de despacho por el id tipo LONG")
-    public ResponseEntity<?> buscar(@PathVariable Long id) {
+    public ResponseEntity<?> buscar(@RequestParam Long id) {
         try {
             DetalleDespacho detalle = detalleDespachoServiceImpl.buscarPorId(id)
                     .orElseThrow(() -> new RecursoNoEncontradoException("Detalle no encontrada con ID: " + id));
@@ -62,7 +62,7 @@ public class DetalleDespachoController {
             return new ResponseEntity<>("Error al buscar detalle", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/crearDetalle")
+    @PostMapping("/crear")
     @Operation(summary = "Este metodo crea un detalle de despacho. Valida que el producto y el inventario existan como tambien la orden a la que se quiere agregar el detalle")
     public ResponseEntity<?> crear(@RequestBody DetalleDespachoDTO dto) {
         try {
@@ -98,15 +98,20 @@ public class DetalleDespachoController {
     }
 
 
-    @PutMapping("/actualizarDetalle/{id}")
+    @PutMapping("/actualizar")
     @Operation(summary = "Este metodo actualiza un detalle de despacho por el id tipo LONG")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody DetalleDespachoDTO dto) {
+    public ResponseEntity<?> actualizar(@RequestParam Long id, @RequestBody DetalleDespachoDTO dto) {
         try {
             DetalleDespacho detalle = detalleDespachoServiceImpl.buscarPorId(id)
                     .orElseThrow(() -> new RecursoNoEncontradoException("Detalle no encontrada con ID: " + id));
 
-            Inventario inventario = inventarioServiceImpl.buscarPorId(dto.getProducto().getIdProducto())
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
+            List<Inventario> inventarios = inventarioServiceImpl.buscarInventariosPorIdProducto(dto.getProducto().getIdProducto());
+
+            if(inventarios.isEmpty()){
+                throw new RecursoNoEncontradoException("No existe inventario con el producto "+ dto.getProducto().getNombre());
+            }
+
+            Inventario inventario = inventarios.stream().filter(invent -> invent.getCantidad() >= dto.getCantidad()).findFirst().get();
 
             if (dto.getCantidad() > inventario.getCantidad()) {
                 throw new RecursoNoEncontradoException("Cantidad insuficiente en inventario");
@@ -122,7 +127,7 @@ public class DetalleDespachoController {
         }
     }
 
-    @DeleteMapping("/eliminarDetalle")
+    @DeleteMapping("/eliminar")
     @Operation(summary = "Este metodo elimina un detalle de una orden de despacho")
     public ResponseEntity<?> eliminar(@RequestParam Long id) {
         try {
