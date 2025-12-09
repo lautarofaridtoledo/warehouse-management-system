@@ -2,6 +2,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.Controladores;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.DetalleDespachoDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
+import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.StockInsuficienteException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.*;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.DetalleDespachoServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.InventarioServiceImpl;
@@ -26,10 +27,10 @@ public class DetalleDespachoController {
     private final InventarioServiceImpl inventarioServiceImpl;
 
     @Autowired
-    public DetalleDespachoController( DetalleDespachoServiceImpl detalleDespachoServiceImpl,
-    ProductoServiceImpl productoServiceImpl,
-    OrdenDespachoServiceImpl ordenDespachoServiceImpl,
-    InventarioServiceImpl inventarioServiceImpl) {
+    public DetalleDespachoController(DetalleDespachoServiceImpl detalleDespachoServiceImpl,
+                                     ProductoServiceImpl productoServiceImpl,
+                                     OrdenDespachoServiceImpl ordenDespachoServiceImpl,
+                                     InventarioServiceImpl inventarioServiceImpl) {
         this.detalleDespachoServiceImpl = detalleDespachoServiceImpl;
         this.productoServiceImpl = productoServiceImpl;
         this.ordenDespachoServiceImpl = ordenDespachoServiceImpl;
@@ -37,8 +38,8 @@ public class DetalleDespachoController {
     }
 
     @GetMapping("/buscar")
-    @Operation(summary = "Este metodo busca todos los deetalles de despachos guardados en la base de datos")
-    public ResponseEntity<?> buscarTodos() {
+    @Operation(summary = "Este metodo busca todos los detalles de despachos guardados en la base de datos")
+    public ResponseEntity<List<DetalleDespachoDTO>> buscarTodos() {
         List<DetalleDespacho> detalles = detalleDespachoServiceImpl.buscarTodos()
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontraron detalles de despacho"));
 
@@ -51,96 +52,71 @@ public class DetalleDespachoController {
 
     @GetMapping("/buscarPorId")
     @Operation(summary = "Este metodo busca un detalle de despacho por el id tipo LONG")
-    public ResponseEntity<?> buscar(@RequestParam Long id) {
-        try {
-            DetalleDespacho detalle = detalleDespachoServiceImpl.buscarPorId(id)
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Detalle no encontrada con ID: " + id));
-            return new ResponseEntity<>( new DetalleDespachoDTO(detalle), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al buscar detalle", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<DetalleDespachoDTO> buscar(@RequestParam Long id) {
+        DetalleDespacho detalle = detalleDespachoServiceImpl.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Detalle no encontrado con ID: " + id));
+
+        return ResponseEntity.ok(new DetalleDespachoDTO(detalle));
     }
+
     @PostMapping("/crear")
     @Operation(summary = "Este metodo crea un detalle de despacho. Valida que el producto y el inventario existan como tambien la orden a la que se quiere agregar el detalle")
-    public ResponseEntity<?> crear(@RequestBody DetalleDespachoDTO dto) {
-        try {
-            Producto producto = productoServiceImpl.buscarPorId(dto.getProducto().getIdProducto())
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+    public ResponseEntity<DetalleDespachoDTO> crear(@RequestBody DetalleDespachoDTO dto) {
+        Producto producto = productoServiceImpl.buscarPorId(dto.getProducto().getIdProducto())
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
-            Inventario inventario = inventarioServiceImpl.buscarPorId(dto.getProducto().getIdProducto())
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
+        Inventario inventario = inventarioServiceImpl.buscarPorId(dto.getProducto().getIdProducto())
+                .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
 
-            if (dto.getCantidad() > inventario.getCantidad()) {
-                throw new RecursoNoEncontradoException("Cantidad insuficiente en inventario");
-            }
-
-            OrdenDespacho orden = ordenDespachoServiceImpl.buscarPorId(dto.getOrdenDespacho().getIdOrdenDespacho())
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Orden no encontrada"));
-
-            DetalleDespacho detalle = new DetalleDespacho();
-            detalle.setProducto(producto);
-            detalle.setOrdenDespacho(orden);
-            detalle.setCantidad(dto.getCantidad());
-
-            inventarioServiceImpl.disminuirCantidad(detalle);
-
-            detalleDespachoServiceImpl.crear(detalle);
-
-            return new ResponseEntity<>(new DetalleDespachoDTO(detalle), HttpStatus.CREATED);
-
-        } catch (RecursoNoEncontradoException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al crear detalle de despacho", HttpStatus.INTERNAL_SERVER_ERROR);
+        if (dto.getCantidad() > inventario.getCantidad()) {
+            throw new StockInsuficienteException("Cantidad insuficiente en inventario");
         }
-    }
 
+        OrdenDespacho orden = ordenDespachoServiceImpl.buscarPorId(dto.getOrdenDespacho().getIdOrdenDespacho())
+                .orElseThrow(() -> new RecursoNoEncontradoException("Orden no encontrada"));
+
+        DetalleDespacho detalle = new DetalleDespacho();
+        detalle.setProducto(producto);
+        detalle.setOrdenDespacho(orden);
+        detalle.setCantidad(dto.getCantidad());
+
+        inventarioServiceImpl.disminuirCantidad(detalle);
+        detalleDespachoServiceImpl.crear(detalle);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new DetalleDespachoDTO(detalle));
+    }
 
     @PutMapping("/actualizar")
     @Operation(summary = "Este metodo actualiza un detalle de despacho por el id tipo LONG")
-    public ResponseEntity<?> actualizar(@RequestParam Long id, @RequestBody DetalleDespachoDTO dto) {
-        try {
-            DetalleDespacho detalle = detalleDespachoServiceImpl.buscarPorId(id)
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Detalle no encontrada con ID: " + id));
+    public ResponseEntity<DetalleDespachoDTO> actualizar(@RequestParam Long id, @RequestBody DetalleDespachoDTO dto) {
+        DetalleDespacho detalle = detalleDespachoServiceImpl.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Detalle no encontrado con ID: " + id));
 
-            List<Inventario> inventarios = inventarioServiceImpl.buscarInventariosPorIdProducto(dto.getProducto().getIdProducto());
+        List<Inventario> inventarios = inventarioServiceImpl.buscarInventariosPorIdProducto(dto.getProducto().getIdProducto());
 
-            if(inventarios.isEmpty()){
-                throw new RecursoNoEncontradoException("No existe inventario con el producto "+ dto.getProducto().getNombre());
-            }
-
-            Inventario inventario = inventarios.stream().filter(invent -> invent.getCantidad() >= dto.getCantidad()).findFirst().get();
-
-            if (dto.getCantidad() > inventario.getCantidad()) {
-                throw new RecursoNoEncontradoException("Cantidad insuficiente en inventario");
-            }
-
-            detalle.setProducto(dto.getProducto());
-            detalle.setCantidad(dto.getCantidad());
-
-            detalleDespachoServiceImpl.crear(detalle);
-            return new ResponseEntity<>(detalle, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al actualizar detalle", HttpStatus.INTERNAL_SERVER_ERROR);
+        if (inventarios.isEmpty()) {
+            throw new RecursoNoEncontradoException("No existe inventario con el producto " + dto.getProducto().getNombre());
         }
+
+        Inventario inventario = inventarios.stream()
+                .filter(invent -> invent.getCantidad() >= dto.getCantidad())
+                .findFirst()
+                .orElseThrow(() -> new StockInsuficienteException("Cantidad insuficiente en inventario"));
+
+        detalle.setProducto(dto.getProducto());
+        detalle.setCantidad(dto.getCantidad());
+
+        detalleDespachoServiceImpl.crear(detalle);
+        return ResponseEntity.ok(new DetalleDespachoDTO(detalle));
     }
 
     @DeleteMapping("/eliminar")
     @Operation(summary = "Este metodo elimina un detalle de una orden de despacho")
-    public ResponseEntity<?> eliminar(@RequestParam Long id) {
-        try {
-            if (!detalleDespachoServiceImpl.ExistePorId(id)) {
-                return new ResponseEntity<>("Detalle de despacho con id " + id + " no encontrada", HttpStatus.NOT_FOUND);
-            }
-            detalleDespachoServiceImpl.eliminar(id);
-            return new ResponseEntity<>("Detalle eliminada con exito", HttpStatus.OK);
-        } catch (RecursoNoEncontradoException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Error al eliminar detalle: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> eliminar(@RequestParam Long id) {
+        if (!detalleDespachoServiceImpl.ExistePorId(id)) {
+            throw new RecursoNoEncontradoException("Detalle de despacho con id " + id + " no encontrado");
         }
+        detalleDespachoServiceImpl.eliminar(id);
+        return ResponseEntity.ok("Detalle eliminado con éxito");
     }
 }

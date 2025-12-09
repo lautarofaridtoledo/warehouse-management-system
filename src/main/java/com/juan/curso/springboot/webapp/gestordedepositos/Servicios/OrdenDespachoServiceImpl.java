@@ -2,10 +2,10 @@ package com.juan.curso.springboot.webapp.gestordedepositos.Servicios;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.OrdenDespachoDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
-import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.StockInsuficienteException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.*;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.OrdenDespachoRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +20,17 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
     private final OrdenDespachoRepositorio ordenDespachoRepositorio;
     private final ClienteServiceImpl clienteService;
     private final ProductoServiceImpl productoService;
-    private final InventarioServiceImpl inventarioService;
+    private final StockDomainService stockDomainService;
 
     @Autowired
     public OrdenDespachoServiceImpl(OrdenDespachoRepositorio ordenDespachoRepositorio,
                                     ClienteServiceImpl clienteService,
                                     ProductoServiceImpl productoService,
-                                    InventarioServiceImpl inventarioService) {
+                                    StockDomainService stockDomainService) {
         this.ordenDespachoRepositorio = ordenDespachoRepositorio;
         this.clienteService = clienteService;
         this.productoService = productoService;
-        this.inventarioService = inventarioService;
+        this.stockDomainService = stockDomainService;
     }
 
     // ... métodos básicos (buscarTodos, buscarPorId, eliminar) ...
@@ -80,9 +80,10 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
             Producto producto = productoService.buscarPorId(detalleDto.getProducto().getIdProducto())
                     .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
-            int stockTotal = inventarioService.calcularStockTotalPorIdProducto(producto.getIdProducto());
-            if (stockTotal < detalleDto.getCantidad()) {
-                throw new StockInsuficienteException("Stock insuficiente para " + producto.getNombre());
+            // Validación de stock ahora usa StockDomainService
+            if (!stockDomainService.hayStockSuficiente(producto, detalleDto.getCantidad())) {
+                throw new RuntimeException("Stock insuficiente para " + producto.getNombre() + 
+                        ". Disponible: " + stockDomainService.calcularStockTotal(producto));
             }
 
             DetalleDespacho detalle = new DetalleDespacho();
@@ -91,7 +92,8 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
             detalle.setOrdenDespacho(orden);
             detalles.add(detalle);
 
-            inventarioService.disminuirCantidad(detalle);
+            // Retira stock distribuido (FIFO)
+            stockDomainService.retirarStockDistribuido(producto, detalleDto.getCantidad());
         }
 
         orden.setDetalleDespacho(detalles);
@@ -108,8 +110,9 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
             throw new RuntimeException("No se puede editar una orden COMPLETADA.");
         }
 
+        // Revertir: devolver stock de detalles anteriores
         for (DetalleDespacho detalleViejo : ordenActual.getDetalleDespacho()) {
-            inventarioService.agregarMercaderiaConProductoPersistido(
+            stockDomainService.ingresarStockDistribuido(
                     detalleViejo.getProducto(),
                     detalleViejo.getCantidad()
             );
@@ -136,7 +139,8 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
             detalle.setOrdenDespacho(ordenActual);
             nuevosDetalles.add(detalle);
 
-            inventarioService.disminuirCantidad(detalle);
+            // Retirar nuevo stock
+            stockDomainService.retirarStockDistribuido(producto, detalleDto.getCantidad());
         }
 
         ordenActual.getDetalleDespacho().addAll(nuevosDetalles);
@@ -150,7 +154,7 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
 
         // Devolver stock al inventario
         for (DetalleDespacho detalle : orden.getDetalleDespacho()) {
-            inventarioService.agregarMercaderiaConProductoPersistido(
+            stockDomainService.ingresarStockDistribuido(
                     detalle.getProducto(),
                     detalle.getCantidad()
             );

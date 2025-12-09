@@ -1,12 +1,7 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.Controladores;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ClienteDTO;
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ProveedorDTO;
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.UbicacionDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ZonaDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Cliente;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Zona;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.ZonaServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +25,7 @@ public class ZonaController {
 
     @GetMapping("/todos")
     @Operation(summary = "Este metodo busca todas las zonas")
-    public ResponseEntity<?> buscarTodos() {
+    public ResponseEntity<List<ZonaDTO>> buscarTodos() {
         List<Zona> zonas = zonaService.buscarTodos()
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontraron las zonas"));
 
@@ -43,61 +38,43 @@ public class ZonaController {
 
     @GetMapping("/buscarPorId")
     @Operation(summary = "Este metodo busca una zona por su id")
-    public ResponseEntity<?> buscar(@RequestParam Long id) {
-        try {
-            Zona zona = zonaService.buscarPorId(id)
-                    .orElseThrow(() -> new RuntimeException("Zona no encontrada con ID: " + id));
+    public ResponseEntity<ZonaDTO> buscar(@RequestParam Long id) {
+        Zona zona = zonaService.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Zona no encontrada con ID: " + id));
 
-            return ResponseEntity.ok(new ZonaDTO(zona));
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al buscar zona", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ResponseEntity.ok(new ZonaDTO(zona));
     }
 
     @PostMapping("/crear")
     @Operation(summary = "Este metodo crea una nueva zona")
-    public ResponseEntity<?> crear(@RequestBody ZonaDTO dto) {
-        try {
-            Zona zona = new Zona();
-            zona.setNombre(dto.getNombre());
-            zona.setDescripcion(dto.getDescripcion());
-            zona.setCategoriasAdmitidas(dto.getCategoriasAdmitidas());
+    public ResponseEntity<ZonaDTO> crear(@RequestBody ZonaDTO dto) {
+        Zona zona = new Zona();
+        zona.setNombre(dto.getNombre());
+        zona.setDescripcion(dto.getDescripcion());
+        zona.setCategoriasAdmitidas(dto.getCategoriasAdmitidas());
 
-            zonaService.crear(zona);
-            return new ResponseEntity<>(new ZonaDTO(zona), HttpStatus.CREATED);
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Error al crear zona", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        zonaService.crear(zona);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ZonaDTO(zona));
     }
 
     @PutMapping("/actualizar")
     @Operation(summary = "Este metodo actualiza una zona")
-    public ResponseEntity<?> actualizar(@RequestParam Long id, @RequestBody ZonaDTO dto) {
-        try {
-            Zona zona = zonaService.buscarPorId(id)
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Zona no encontrada con id: "+ id));
+    public ResponseEntity<ZonaDTO> actualizar(@RequestParam Long id, @RequestBody ZonaDTO dto) {
+        Zona zona = zonaService.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Zona no encontrada con id: " + id));
 
-            zona.setNombre(dto.getNombre());
-            zona.setDescripcion(dto.getDescripcion());
-            zona.setCategoriasAdmitidas(dto.getCategoriasAdmitidas());
+        zona.setNombre(dto.getNombre());
+        zona.setDescripcion(dto.getDescripcion());
+        zona.setCategoriasAdmitidas(dto.getCategoriasAdmitidas());
 
-            zonaService.actualizar(zona);
+        zonaService.actualizar(zona);
 
-            return ResponseEntity.ok(new ZonaDTO(zona));
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Error al actualizar zona", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ResponseEntity.ok(new ZonaDTO(zona));
     }
 
     @DeleteMapping("/eliminar")
     @Operation(summary = "Este metodo elimina una zona")
-    public ResponseEntity<?> eliminar(@RequestParam Long id) {
+    public ResponseEntity<String> eliminar(@RequestParam Long id) {
         zonaService.eliminar(id);
         return ResponseEntity.ok("Zona eliminada con éxito");
     }

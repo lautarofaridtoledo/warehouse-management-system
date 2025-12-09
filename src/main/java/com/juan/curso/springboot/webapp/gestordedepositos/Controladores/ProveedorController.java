@@ -1,6 +1,5 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.Controladores;
 
-
 import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ProveedorDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
@@ -27,11 +26,10 @@ public class ProveedorController {
 
     @GetMapping("/todos")
     @Operation(summary = "Este metodo busca todos los proveedores")
-    public ResponseEntity<?> buscarTodos() {
-        List<Proveedor> proveedores = proveedorService.buscarTodos()
-                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontraron los proveedores"));
-
-        List<ProveedorDTO> dtoList = proveedores.stream()
+    public ResponseEntity<List<ProveedorDTO>> buscarTodos() {
+        List<ProveedorDTO> dtoList = proveedorService.buscarTodos()
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontraron los proveedores"))
+                .stream()
                 .map(ProveedorDTO::new)
                 .collect(Collectors.toList());
 
@@ -40,69 +38,48 @@ public class ProveedorController {
 
     @GetMapping("/buscarPorId")
     @Operation(summary = "Este metodo busca un proveedor por su id")
-    public ResponseEntity<?> buscar(@RequestParam Long id) {
-        try {
-            Proveedor proveedor = proveedorService.buscarPorId(id)
-                    .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + id));
+    public ResponseEntity<ProveedorDTO> buscar(@RequestParam Long id) {
+        Proveedor proveedor = proveedorService.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado con ID: " + id));
 
-            return ResponseEntity.ok(new ProveedorDTO(proveedor));
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al buscar proveedor", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ResponseEntity.ok(new ProveedorDTO(proveedor));
     }
 
     @PostMapping("/crear")
     @Operation(summary = "Este metodo crea un nuevo proveedor")
-    public ResponseEntity<?> crear(@RequestBody ProveedorDTO dto) {
-        try {
-            Proveedor proveedor = new Proveedor();
-            proveedor.setNombre(dto.getNombre());
-            proveedor.setTelefono(dto.getTelefono());
-            proveedor.setEmail(dto.getEmail());
+    public ResponseEntity<ProveedorDTO> crear(@RequestBody ProveedorDTO dto) {
+        Proveedor proveedor = new Proveedor();
+        proveedor.setNombre(dto.getNombre());
+        proveedor.setTelefono(dto.getTelefono());
+        proveedor.setEmail(dto.getEmail());
 
-            proveedorService.crear(proveedor);
+        proveedorService.crear(proveedor);
 
-            return new ResponseEntity<>(new ProveedorDTO(proveedor), HttpStatus.CREATED);
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Error al crear proveedor", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(new ProveedorDTO(proveedor), HttpStatus.CREATED);
     }
 
     @PutMapping("/actualizar")
     @Operation(summary = "Este metodo actualiza un proveedor")
-    public ResponseEntity<?> actualizar(@RequestParam Long id, @RequestBody ProveedorDTO dto) {
-        try {
-            Proveedor proveedor = proveedorService.buscarPorId(id)
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado con id: "+ id));
+    public ResponseEntity<ProveedorDTO> actualizar(@RequestParam Long id, @RequestBody ProveedorDTO dto) {
+        Proveedor proveedor = proveedorService.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado con id: " + id));
 
-            proveedor.setNombre(dto.getNombre());
-            proveedor.setTelefono(dto.getTelefono());
-            proveedor.setEmail(dto.getEmail());
+        proveedor.setNombre(dto.getNombre());
+        proveedor.setTelefono(dto.getTelefono());
+        proveedor.setEmail(dto.getEmail());
 
-            proveedorService.actualizar(proveedor);
+        proveedorService.actualizar(proveedor);
 
-            return ResponseEntity.ok(new ProveedorDTO(proveedor));
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Error al actualizar proveedor", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ResponseEntity.ok(new ProveedorDTO(proveedor));
     }
 
     @DeleteMapping("eliminar")
     @Operation(summary = "Este metodo elimina un proveedor por su id")
-    public ResponseEntity<?> eliminar(@RequestParam Long id) {
-        try {
-            proveedorService.eliminar(id);
-            return ResponseEntity.ok("Proveedor eliminado con éxito");
-        }catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
-            return new ResponseEntity<>("Error al eliminar proveedor", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> eliminar(@RequestParam Long id) {
+        proveedorService.buscarPorId(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado con ID: " + id));
+        
+        proveedorService.eliminar(id);
+        return ResponseEntity.ok("Proveedor eliminado con éxito");
     }
 }

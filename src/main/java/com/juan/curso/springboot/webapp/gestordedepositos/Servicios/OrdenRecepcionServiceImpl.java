@@ -9,6 +9,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenRecepcion
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.OrdenRecepcionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,17 +26,17 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
     private final OrdenRecepcionRepositorio ordenRecepcionRepositorio;
     private final ProveedorServiceImpl proveedorService;
     private final ProductoServiceImpl productoService;
-    private final InventarioServiceImpl inventarioService;
+    private final StockDomainService stockDomainService;
 
     @Autowired
     public OrdenRecepcionServiceImpl(OrdenRecepcionRepositorio ordenRecepcionRepositorio,
                                      ProveedorServiceImpl proveedorService,
                                      ProductoServiceImpl productoService,
-                                     InventarioServiceImpl inventarioService) {
+                                     StockDomainService stockDomainService) {
         this.ordenRecepcionRepositorio = ordenRecepcionRepositorio;
         this.proveedorService = proveedorService;
         this.productoService = productoService;
-        this.inventarioService = inventarioService;
+        this.stockDomainService = stockDomainService;
     }
 
     @Override
@@ -111,7 +112,8 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
             detalle.setOrdenRecepcion(orden);
             detalles.add(detalle);
 
-            inventarioService.agregarMercaderiaConProductoPersistido(producto, detalleDTO.getCantidad());
+            // Delega a StockDomainService para ingreso de stock distribuido
+            stockDomainService.ingresarStockDistribuido(producto, detalleDTO.getCantidad());
         }
 
         orden.setDetallesRecepcion(detalles);
@@ -128,8 +130,9 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
             throw new RuntimeException("No se puede editar una orden COMPLETADA.");
         }
 
+        // Revertir stock de detalles anteriores
         for (DetalleRecepcion detalleViejo : ordenActual.getDetallesRecepcion()) {
-            inventarioService.deshacerIngreso(detalleViejo.getProducto(), detalleViejo.getCantidad());
+            stockDomainService.retirarStockDistribuido(detalleViejo.getProducto(), detalleViejo.getCantidad());
         }
 
         Proveedor proveedor = proveedorService.buscarPorId(dto.getProveedor().getId_proveedor())
@@ -157,7 +160,8 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
             detalle.setOrdenRecepcion(ordenActual);
             nuevosDetalles.add(detalle);
 
-            inventarioService.agregarMercaderiaConProductoPersistido(producto, detalleDTO.getCantidad());
+            // Ingresar nuevo stock
+            stockDomainService.ingresarStockDistribuido(producto, detalleDTO.getCantidad());
         }
 
         ordenActual.getDetallesRecepcion().addAll(nuevosDetalles);
@@ -170,19 +174,14 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
         OrdenRecepcion orden = ordenRecepcionRepositorio.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Orden no encontrada con ID: " + id));
 
-        // Si la orden ya estaba completada o había impactado stock:
-        // Debemos retirar la mercadería que esta orden trajo.
+        // Revertir stock: retirar la mercadería que esta orden ingresó
         for (DetalleRecepcion detalle : orden.getDetallesRecepcion()) {
-
-            // Usamos el método que creamos para la edición.
-            // Esto busca inventarios de ese producto y los descuenta.
-            inventarioService.deshacerIngreso(
+            stockDomainService.retirarStockDistribuido(
                     detalle.getProducto(),
                     detalle.getCantidad()
             );
         }
 
-        // Ahora sí, borramos el registro administrativo
         ordenRecepcionRepositorio.delete(orden);
     }
 
