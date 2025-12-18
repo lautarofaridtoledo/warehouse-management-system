@@ -9,45 +9,43 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+/**
+ * Legacy wrapper for Rol service to keep by-type injections working.
+ * Delegates to the module implementation in modules/security/roles.
+ */
+@Deprecated
+@Service("legacyRolService")
 public class RolServiceImpl implements GenericService<Rol, Long> {
+
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.application.RolServiceImpl delegate;
+
     @Autowired
-    RolRepositorio rolRepositorio;
-
-    public RolServiceImpl() {
+    public RolServiceImpl(com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.application.RolServiceImpl delegate) {
+        this.delegate = delegate;
     }
-
 
     @Override
     public Optional<List<Rol>> buscarTodos() {
-        try {
-            return Optional.of(rolRepositorio.findAll());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return delegate.buscarTodos();
     }
 
     @Override
     public Optional<Rol> buscarPorId(Long id) {
-        Optional<Rol> rol = rolRepositorio.findById(id);
-        return rol ;
+        return delegate.buscarPorId(id);
     }
 
     @Override
     public Rol crear(Rol rol) {
-        rol = rolRepositorio.save(rol);
-        return rol;
+        return delegate.crear(rol);
     }
 
     @Override
     public Rol actualizar(Rol rol) {
-        rol = rolRepositorio.save(rol);
-        return rol;
+        return delegate.actualizar(rol);
     }
 
     @Override
     public void eliminar(Long id) {
-
+        delegate.eliminar(id);
     }
 }

@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+// NOTA: Este controller legacy NO está anotado como @RestController para evitar endpoints duplicados.
+// La versión activa vive en modules/security/users/api.
 @RequestMapping("/GestorDeDepositos/usuarios")
 public class UsuarioController {
 

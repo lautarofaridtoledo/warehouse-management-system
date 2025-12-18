@@ -2,110 +2,85 @@ package com.juan.curso.springboot.webapp.gestordedepositos.Servicios;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.*;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.InventarioRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+/**
+ * Wrapper de compatibilidad.
+ *
+ * Migración estructural: el servicio real vive en
+ * {@link com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl}.
+ *
+ * Mantener este wrapper permite migrar imports por etapas sin romper compilación.
+ */
+@Deprecated(forRemoval = true)
+@Service("legacyInventarioService")
 public class InventarioServiceImpl implements GenericService<Inventario, Long> {
 
-    @Autowired
-    InventarioRepositorio inventarioRepositorio;
-    @Autowired
-    ProductoServiceImpl productoService;
-    @Autowired
-    StockDomainService stockDomainService;
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl delegate;
 
-    public InventarioServiceImpl() {
+    public InventarioServiceImpl(
+            com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public Optional<List<Inventario>> buscarTodos() {
-        try{ return Optional.of(inventarioRepositorio.findAll()); } catch (Exception e){ e.printStackTrace(); } return Optional.empty();
+        return delegate.buscarTodos();
     }
 
     @Override
     public Optional<Inventario> buscarPorId(Long id) throws RecursoNoEncontradoException {
-        try { return inventarioRepositorio.findById(id); } catch (Exception e){ e.printStackTrace(); return Optional.empty(); }
+        return delegate.buscarPorId(id);
     }
 
     @Override
     public Inventario crear(Inventario inventario) {
-        try{
-            inventario.setFecha_actualizacion(Calendar.getInstance().getTime());
-            return inventarioRepositorio.save(inventario);
-        } catch (RuntimeException e) { throw new RuntimeException(e); }
+        return delegate.crear(inventario);
     }
 
     @Override
     public Inventario actualizar(Inventario inventario) {
-        try{
-            inventario.setFecha_actualizacion(Calendar.getInstance().getTime());
-            return inventarioRepositorio.save(inventario);
-        } catch (RuntimeException e) { throw new RuntimeException(e); }
+        return delegate.actualizar(inventario);
     }
 
     @Override
     public void eliminar(Long id) {
-        try{ inventarioRepositorio.deleteById(id); } catch (RuntimeException e) { throw new RuntimeException(e); }
+        delegate.eliminar(id);
     }
 
     public List<Inventario> buscarInventariosPorIdProducto(Long idProducto) throws RecursoNoEncontradoException{
-        try {
-            String sku = productoService.buscarPorId(idProducto).get().getCodigoSku();
-            return inventarioRepositorio.findAllByProducto_CodigoSku(sku);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return delegate.buscarInventariosPorIdProducto(idProducto);
 
     }
 
     public List<Inventario> buscarPorCodigoSku(String codigoSku) {
-        return inventarioRepositorio.findAllByProducto_CodigoSku(codigoSku);
+        return delegate.buscarPorCodigoSku(codigoSku);
     }
 
     public int calcularStockTotalPorIdProducto(Long idProducto) {
-        try {
-            List<Inventario> inventarios = buscarInventariosPorIdProducto(idProducto);
-            return inventarios.stream().mapToInt(Inventario::getCantidad).sum();
-        } catch (Exception e) { return 0; }
+        return delegate.calcularStockTotalPorIdProducto(idProducto);
     }
 
     public int calcularStockTotalPorCodigoSku(String codigoSku) {
-        try {
-            List<Inventario> inventarios = buscarPorCodigoSku(codigoSku);
-            return inventarios.stream().mapToInt(Inventario::getCantidad).sum();
-        } catch (Exception e) { return 0; }
+        return delegate.calcularStockTotalPorCodigoSku(codigoSku);
     }
 
-    @Transactional
     public List<Inventario> disminuirCantidad(DetalleDespacho detalleDespacho) {
-        // Delega a StockDomainService que maneja todo: inventario, ubicación y movimiento
-        stockDomainService.retirarStockDistribuido(
-                detalleDespacho.getProducto(), 
-                detalleDespacho.getCantidad()
-        );
-        return buscarInventariosPorIdProducto(detalleDespacho.getProducto().getIdProducto());
+        return delegate.disminuirCantidad(detalleDespacho);
     }
 
-    @Transactional
     public void deshacerIngreso(Producto producto, int cantidad) {
-        // Delega a StockDomainService
-        stockDomainService.retirarStockDistribuido(producto, cantidad);
+        delegate.deshacerIngreso(producto, cantidad);
     }
 
     /**
      * Agrega mercadería distribuyendo en ubicaciones disponibles.
      * Delega completamente a StockDomainService.
      */
-    @Transactional
     public void agregarMercaderiaConProductoPersistido(Producto producto, int cantidad) {
-        stockDomainService.ingresarStockDistribuido(producto, cantidad);
+        delegate.agregarMercaderiaConProductoPersistido(producto, cantidad);
     }
 }

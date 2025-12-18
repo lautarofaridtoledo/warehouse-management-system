@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+// Nota: No se anota con @RestController para evitar endpoints duplicados.
+
 @RequestMapping("GestorDeDepositos/ordenes-recepcion")
 public class OrdenRecepcionController {
 

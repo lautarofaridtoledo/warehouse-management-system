@@ -13,103 +13,58 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+/**
+ * Wrapper legacy para mantener compatibilidad con inyecciones por tipo.
+ *
+ * La implementación real vive en modules/orders/recepcion/application.
+ */
+@Deprecated
+@Service("legacyDetalleRecepcionService")
 public class DetalleRecepcionServiceImpl implements GenericService<DetalleRecepcion, Long> {
-    private final DetalleRecepcionRepositorio detalleRecepcionRepositorio;
+
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.application.DetalleRecepcionServiceImpl delegate;
+
     @Autowired
-    public DetalleRecepcionServiceImpl (DetalleRecepcionRepositorio detalleRecepcionRepositorio) {
-        this.detalleRecepcionRepositorio = detalleRecepcionRepositorio;
+    public DetalleRecepcionServiceImpl(
+            com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.application.DetalleRecepcionServiceImpl delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public Optional<List<DetalleRecepcion>> buscarTodos() {
-        try{
-            Optional<List<DetalleRecepcion>> detalles = Optional.of(new ArrayList<>(detalleRecepcionRepositorio.findAll()));
-            if(detalles.isPresent()) {
-                return detalles;
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
+        return delegate.buscarTodos();
     }
     @Override
     public Optional<DetalleRecepcion> buscarPorId(Long id) {
-        if(id!= null) {
-            try {
-                Optional<DetalleRecepcion> detalle = detalleRecepcionRepositorio.findById(id);
-                if(detalle.isPresent()) {
-                    return detalle;
-                }
-                return Optional.empty();
-            }catch(Exception e) {
-                e.printStackTrace();
-            }
-        }else{
-            throw new IllegalArgumentException("El id del detalle recepcion no existe.");
-        }
-        return Optional.empty();
+        return delegate.buscarPorId(id);
 
     }
 
     @Override
     public DetalleRecepcion crear(DetalleRecepcion detalle) {
-        try {
-            detalle = detalleRecepcionRepositorio.save(detalle);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return detalle;
+        return delegate.crear(detalle);
     }
 
     public List<DetalleRecepcion> crearTodos(List<DetalleRecepcion> detalles) {
-        try {
-            return detalleRecepcionRepositorio.saveAll(detalles);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("No se pudieron guardar los detalles de recepción", e);
-        }
+        return delegate.crearTodos(detalles);
     }
 
     @Override
     public DetalleRecepcion actualizar(DetalleRecepcion detalle) {
-        try {
-            detalle = detalleRecepcionRepositorio.save(detalle);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return detalle;
+        return delegate.actualizar(detalle);
     }
 
     @Override
     public void eliminar(Long id) {
-        try {
-            detalleRecepcionRepositorio.deleteById(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        delegate.eliminar(id);
     }
 
     public void eliminarTodos(List<DetalleRecepcion> detalles){
-        try{
-            detalleRecepcionRepositorio.deleteAll(detalles);
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
+        delegate.eliminarTodos(detalles);
     }
 
     public Optional<List<DetalleRecepcion>> buscarDetallesPorOrden(Long orden) {
-        try{
-            Optional<List<DetalleRecepcion>> detalles = detalleRecepcionRepositorio.findByOrdenRecepcion_IdOrdenRecepcion(orden);
-             if(detalles.isPresent()) {
-                 return detalles;
-             }else{
-                 throw new RecursoNoEncontradoException("No se encontraron detalles para esa orden");
-             }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return Optional.empty();
+        return delegate.buscarDetallesPorOrden(orden);
     }
 
 }

@@ -2,68 +2,43 @@ package com.juan.curso.springboot.webapp.gestordedepositos.Servicios;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ProveedorRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Deprecated(forRemoval = true)
 public class ProveedorServiceImpl implements GenericService<Proveedor, Long> {
 
-    @Autowired
-    ProveedorRepositorio proveedorRepositorio;
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.proveedores.application.ProveedorServiceImpl delegate;
 
-    public ProveedorServiceImpl() {
+    @Autowired
+    public ProveedorServiceImpl( com.juan.curso.springboot.webapp.gestordedepositos.modules.proveedores.application.ProveedorServiceImpl delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public Optional<List<Proveedor>> buscarTodos() {
-        try{
-            return Optional.of(proveedorRepositorio.findAll());
-        }catch(Exception e){
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return this.delegate.buscarTodos();
     }
 
     @Override
     public Optional<Proveedor> buscarPorId(Long id) throws RecursoNoEncontradoException {
-        try {
-            return proveedorRepositorio.findById(id);
-        } catch (RecursoNoEncontradoException e) {
-            throw new RecursoNoEncontradoException("Proveedor no encontrado con ID: " + id);
-        }catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+       return this.delegate.buscarPorId(id);
     }
 
     @Override
     public Proveedor crear(Proveedor proveedor) {
-        try {
-            proveedor = proveedorRepositorio.save(proveedor);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return proveedor;
+       return this.delegate.crear(proveedor);
     }
 
     @Override
     public Proveedor actualizar(Proveedor proveedor) {
-        if (!proveedorRepositorio.existsById(proveedor.getId_proveedor())) {
-            throw new RecursoNoEncontradoException("Proveedor no encontrado con ID: " + proveedor.getId_proveedor());
-        }
-        proveedor = proveedorRepositorio.save(proveedor);
-        return proveedor;
+        return this.delegate.actualizar(proveedor);
     }
 
     @Override
     public void eliminar(Long id) {
-        if (!proveedorRepositorio.existsById(id)) {
-            throw new RecursoNoEncontradoException("Proveedor no encontrado con ID: " + id);
-        }
-        proveedorRepositorio.deleteById(id);
+        this.delegate.eliminar(id);
     }
 }

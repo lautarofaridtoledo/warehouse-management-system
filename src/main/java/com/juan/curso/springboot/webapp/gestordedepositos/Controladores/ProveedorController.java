@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("GestorDeDepositos/proveedor")
+@Deprecated(forRemoval = true)
 public class ProveedorController {
 
     private final ProveedorServiceImpl proveedorService;
@@ -24,8 +23,6 @@ public class ProveedorController {
         this.proveedorService = proveedorService;
     }
 
-    @GetMapping("/todos")
-    @Operation(summary = "Este metodo busca todos los proveedores")
     public ResponseEntity<List<ProveedorDTO>> buscarTodos() {
         List<ProveedorDTO> dtoList = proveedorService.buscarTodos()
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontraron los proveedores"))
@@ -36,18 +33,16 @@ public class ProveedorController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping("/buscarPorId")
-    @Operation(summary = "Este metodo busca un proveedor por su id")
-    public ResponseEntity<ProveedorDTO> buscar(@RequestParam Long id) {
+
+    public ResponseEntity<ProveedorDTO> buscar(Long id) {
         Proveedor proveedor = proveedorService.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado con ID: " + id));
 
         return ResponseEntity.ok(new ProveedorDTO(proveedor));
     }
 
-    @PostMapping("/crear")
-    @Operation(summary = "Este metodo crea un nuevo proveedor")
-    public ResponseEntity<ProveedorDTO> crear(@RequestBody ProveedorDTO dto) {
+    
+    public ResponseEntity<ProveedorDTO> crear(ProveedorDTO dto) {
         Proveedor proveedor = new Proveedor();
         proveedor.setNombre(dto.getNombre());
         proveedor.setTelefono(dto.getTelefono());
@@ -58,9 +53,8 @@ public class ProveedorController {
         return new ResponseEntity<>(new ProveedorDTO(proveedor), HttpStatus.CREATED);
     }
 
-    @PutMapping("/actualizar")
-    @Operation(summary = "Este metodo actualiza un proveedor")
-    public ResponseEntity<ProveedorDTO> actualizar(@RequestParam Long id, @RequestBody ProveedorDTO dto) {
+    
+    public ResponseEntity<ProveedorDTO> actualizar(Long id, ProveedorDTO dto) {
         Proveedor proveedor = proveedorService.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado con id: " + id));
 
@@ -73,9 +67,8 @@ public class ProveedorController {
         return ResponseEntity.ok(new ProveedorDTO(proveedor));
     }
 
-    @DeleteMapping("eliminar")
-    @Operation(summary = "Este metodo elimina un proveedor por su id")
-    public ResponseEntity<String> eliminar(@RequestParam Long id) {
+    
+    public ResponseEntity<String> eliminar(Long id) {
         proveedorService.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado con ID: " + id));
         

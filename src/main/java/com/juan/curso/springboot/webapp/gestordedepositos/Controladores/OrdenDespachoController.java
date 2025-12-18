@@ -9,12 +9,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+// Nota: No se anota con @RestController para evitar endpoints duplicados.
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
 @RequestMapping("GestorDeDepositos/ordenes-despacho")
 public class OrdenDespachoController {
 

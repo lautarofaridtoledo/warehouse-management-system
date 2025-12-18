@@ -10,71 +10,49 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+/**
+ * Wrapper legacy para mantener compatibilidad con inyecciones por tipo.
+ *
+ * La implementación real vive en modules/orders/despacho/application.
+ */
+@Deprecated
+@Service("legacyDetalleDespachoService")
 public class DetalleDespachoServiceImpl implements GenericService<DetalleDespacho, Long>{
-    private final DetalleDespachoRepositorio detalleDespachoRepositorio;
+
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.application.DetalleDespachoServiceImpl delegate;
 
     @Autowired
-    public DetalleDespachoServiceImpl(DetalleDespachoRepositorio detalleDespachoRepositorio) {
-        this.detalleDespachoRepositorio = detalleDespachoRepositorio;
+    public DetalleDespachoServiceImpl(
+            com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.application.DetalleDespachoServiceImpl delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public Optional<List<DetalleDespacho>> buscarTodos() {
-        try {
-            return Optional.of(detalleDespachoRepositorio.findAll());
-        }catch (Exception e){
-            return Optional.empty();
-        }
+        return delegate.buscarTodos();
     }
 
     @Override
     public Optional<DetalleDespacho> buscarPorId(Long id) throws RecursoNoEncontradoException {
-        try {
-            return detalleDespachoRepositorio.findById(id);
-        }catch (RecursoNoEncontradoException e){
-            throw new RecursoNoEncontradoException("Detalle de despacho con id " + id + " no encontrado");
-        }catch (Exception e){
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return delegate.buscarPorId(id);
     }
 
     @Override
     public DetalleDespacho crear(DetalleDespacho detalleDespacho) {
-        try {
-            detalleDespacho = detalleDespachoRepositorio.save(detalleDespacho);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return detalleDespacho;
+        return delegate.crear(detalleDespacho);
     }
 
     @Override
     public DetalleDespacho actualizar(DetalleDespacho detalleDespacho) throws RecursoNoEncontradoException{
-        try {
-            detalleDespacho = detalleDespachoRepositorio.save(detalleDespacho);
-        }catch (RecursoNoEncontradoException e){
-            throw new RecursoNoEncontradoException("Detalle de despacho con id " + detalleDespacho.getIdDetalleDespacho() + " no encontrado");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return detalleDespacho;
+        return delegate.actualizar(detalleDespacho);
     }
 
     @Override
     public void eliminar(Long id) {
-        try {
-            detalleDespachoRepositorio.deleteById(id);
-        }catch (RecursoNoEncontradoException e){
-            throw new RecursoNoEncontradoException("Detalle de despacho con id " + id + " no encontrado");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        delegate.eliminar(id);
     }
 
     public boolean ExistePorId(Long id) {
-        return detalleDespachoRepositorio.existsById(id);
+        return delegate.ExistePorId(id);
     }
 }

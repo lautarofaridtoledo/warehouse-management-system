@@ -9,69 +9,45 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+/**
+ * Wrapper legacy para mantener compatibilidad con inyecciones por tipo.
+ *
+ * La implementación real vive en modules/location/zonas/application.
+ */
+@Deprecated
+@Service("legacyZonaService")
 public class ZonaServiceImpl implements GenericService<Zona, Long>{
-    private final ZonaRepositorio zonaRepositorio;
+
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.application.ZonaServiceImpl delegate;
 
     @Autowired
-    public ZonaServiceImpl(ZonaRepositorio zonaRepositorio) {
-        this.zonaRepositorio = zonaRepositorio;
+    public ZonaServiceImpl(
+            com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.application.ZonaServiceImpl delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public Optional<List<Zona>> buscarTodos() {
-        try {
-            return Optional.of(zonaRepositorio.findAll());
-        }catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return delegate.buscarTodos();
     }
 
     @Override
     public Optional<Zona> buscarPorId(Long id) throws RecursoNoEncontradoException{
-        try {
-            return zonaRepositorio.findById(id);
-        }catch (RecursoNoEncontradoException e){
-            throw new RecursoNoEncontradoException("Zona no encontrada con ID: " + id);
-        }catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return delegate.buscarPorId(id);
     }
 
     @Override
     public Zona crear(Zona zona) {
-        try {
-            zona= zonaRepositorio.save(zona);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return zona;
+        return delegate.crear(zona);
     }
 
     @Override
     public Zona actualizar(Zona zona) throws RecursoNoEncontradoException {
-        try {
-           zona = zonaRepositorio.save(zona);
-        }catch (RecursoNoEncontradoException e){
-            throw new RecursoNoEncontradoException("Zona no encontrado con ID: " + zona.getIdZona());
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return zona;
+        return delegate.actualizar(zona);
     }
 
     @Override
     public void eliminar(Long id) {
-
-        // Verificar que exista antes de eliminar
-        if (!zonaRepositorio.existsById(id)) {
-            throw new RecursoNoEncontradoException("Zona no encontrada con ID: " + id);
-        }
-
-        // Si ocurre DataIntegrityViolationException, la dejamos fluir
-        // para que la capture el ManejadorGlobalDeErrores
-        zonaRepositorio.deleteById(id);
+        delegate.eliminar(id);
     }
 }

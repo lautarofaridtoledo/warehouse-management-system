@@ -16,24 +16,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+/**
+ * Wrapper legacy para mantener compatibilidad con inyecciones por tipo.
+ *
+ * La implementación real vive en modules/inventory/movimientos/application.
+ */
+@Deprecated
+@Service("legacyMovimientoInventarioService")
 public class MovimientoInventarioServiceImpl implements GenericService<MovimientoInventario, Long> {
 
-    private final MovimientoInventarioRepositorio movimientoRepositorio;
-    private final UbicacionRepositorio ubicacionRepositorio;
-    private final ProductoRepositorio productoRepositorio;
-    private final StockDomainService stockDomainService;
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.inventory.movimientos.application.MovimientoInventarioServiceImpl delegate;
 
     @Autowired
     public MovimientoInventarioServiceImpl(
-            MovimientoInventarioRepositorio movimientoRepositorio,
-            UbicacionRepositorio ubicacionRepositorio,
-            ProductoRepositorio productoRepositorio,
-            StockDomainService stockDomainService) {
-        this.movimientoRepositorio = movimientoRepositorio;
-        this.ubicacionRepositorio = ubicacionRepositorio;
-        this.productoRepositorio = productoRepositorio;
-        this.stockDomainService = stockDomainService;
+            com.juan.curso.springboot.webapp.gestordedepositos.modules.inventory.movimientos.application.MovimientoInventarioServiceImpl delegate) {
+        this.delegate = delegate;
     }
 
     /**
@@ -43,22 +40,7 @@ public class MovimientoInventarioServiceImpl implements GenericService<Movimient
      */
     @Transactional(rollbackFor = Exception.class)
     public MovimientoInventario procesarMovimiento(MovimientoInventarioDTO dto) {
-        if (dto.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
-        }
-
-        Producto producto = productoRepositorio.findById(dto.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
-
-        Ubicacion origen = ubicacionRepositorio.findById(dto.getUbicacionOrigen().getIdUbicacion())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación origen no encontrada"));
-
-        Ubicacion destino = ubicacionRepositorio.findById(dto.getUbicacionDestino().getIdUbicacion())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación destino no encontrada"));
-
-        // Delega toda la lógica de transferencia a StockDomainService
-        // Esto incluye: validación, actualización de inventarios, ubicaciones y registro del movimiento
-        return stockDomainService.transferirStock(producto, origen, destino, dto.getCantidad());
+    return delegate.procesarMovimiento(dto);
     }
 
     /**
@@ -67,43 +49,31 @@ public class MovimientoInventarioServiceImpl implements GenericService<Movimient
      */
     @Transactional(rollbackFor = Exception.class)
     public void revertirYEliminar(Long idMovimiento) {
-        MovimientoInventario movimiento = buscarPorId(idMovimiento)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Movimiento no encontrado"));
-
-        // Transferencia inversa: de destino a origen
-        stockDomainService.transferirStock(
-                movimiento.getProducto(),
-                movimiento.getUbicacionDestino(),
-                movimiento.getUbicacionOrigen(),
-                movimiento.getCantidad()
-        );
-        
-        // Eliminar el movimiento original (el inverso ya quedó registrado por el domain service)
-        movimientoRepositorio.delete(movimiento);
+    delegate.revertirYEliminar(idMovimiento);
     }
 
     @Override
     public Optional<List<MovimientoInventario>> buscarTodos() {
-        return Optional.of(movimientoRepositorio.findAll());
+        return delegate.buscarTodos();
     }
 
     @Override
     public Optional<MovimientoInventario> buscarPorId(Long id) {
-        return movimientoRepositorio.findById(id);
+        return delegate.buscarPorId(id);
     }
 
     @Override
     public MovimientoInventario crear(MovimientoInventario entity) {
-        return movimientoRepositorio.save(entity);
+        return delegate.crear(entity);
     }
 
     @Override
     public MovimientoInventario actualizar(MovimientoInventario entity) {
-        return movimientoRepositorio.save(entity);
+        return delegate.actualizar(entity);
     }
 
     @Override
     public void eliminar(Long id) {
-        movimientoRepositorio.deleteById(id);
+        delegate.eliminar(id);
     }
 }

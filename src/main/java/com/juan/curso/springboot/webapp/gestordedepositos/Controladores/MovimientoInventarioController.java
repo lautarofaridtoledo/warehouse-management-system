@@ -24,7 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@RestController
+// NOTA: Este controller legacy NO está anotado como @RestController para evitar endpoints duplicados.
+// La versión activa vive en modules/inventory/movimientos/api.
 @RequestMapping("GestorDeDepositos/movimientoInventario")
 public class MovimientoInventarioController {
 

@@ -1,98 +1,55 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.Servicios;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ProductoRepositorio;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+/**
+ * Wrapper de compatibilidad.
+ *
+ * Migración estructural: el servicio real vive en
+ * {@link com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl}.
+ */
+@Deprecated(forRemoval = true)
+@Service("legacyProductoService")
 public class ProductoServiceImpl implements GenericService<Producto, Long> {
 
-    @Autowired
-    ProductoRepositorio productoRepositorio;
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl delegate;
 
-    public ProductoServiceImpl() {
+    @Autowired
+    public ProductoServiceImpl(
+            com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl delegate) {
+        this.delegate = delegate;
     }
 
     @Override
     public Optional<List<Producto>> buscarTodos() {
-        try {
-            return Optional.of(productoRepositorio.findAll());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return delegate.buscarTodos();
     }
 
     @Override
     public Optional<Producto> buscarPorId(Long id) {
-        try {
-            return productoRepositorio.findById(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return delegate.buscarPorId(id);
     }
 
     @Override
-    @Transactional
     public Producto crear(Producto producto) {
-        if (productoRepositorio.existsByCodigoSku(producto.getCodigoSku())) {
-            throw new RuntimeException("El código SKU '" + producto.getCodigoSku() + "' ya existe en el sistema.");
-        }
-
-        try {
-            return productoRepositorio.save(producto);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error al crear el producto en base de datos");
-        }
+        return delegate.crear(producto);
     }
 
     @Override
-    @Transactional
     public Producto actualizar(Producto productoEditado) {
-        // 💡 VALIDACIÓN DE SKU DUPLICADO AL ACTUALIZAR
-        Producto productoActual = productoRepositorio.findById(productoEditado.getIdProducto())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-        // Verificamos si el SKU cambió. Si cambió, chequeamos que el nuevo no esté ocupado.
-        if (!productoActual.getCodigoSku().equalsIgnoreCase(productoEditado.getCodigoSku())) {
-            if (productoRepositorio.existsByCodigoSku(productoEditado.getCodigoSku())) {
-                throw new RuntimeException("El código SKU '" + productoEditado.getCodigoSku() + "' ya existe.");
-            }
-        }
-
-        try {
-            return productoRepositorio.save(productoEditado);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error al actualizar el producto");
-        }
+        return delegate.actualizar(productoEditado);
     }
 
-    @Transactional
     public void eliminar(Long id) {
-        try {
-            Optional<Producto> producto = buscarPorId(id);
-            if (producto.isPresent()) {
-                producto.get().setIsDeleted("S");
-                productoRepositorio.save(producto.get());
-            } else {
-                throw new RuntimeException("No se pudo eliminar: Producto no encontrado");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error al eliminar producto");
-        }
+        delegate.eliminar(id);
     }
 
     public Producto buscarPorCodigoSKU(String codigo) {
-        return productoRepositorio.findProductoByCodigoSkuIs(codigo);
+        return delegate.buscarPorCodigoSKU(codigo);
     }
 }

@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@RestController
+// NOTA: Este controller legacy NO está anotado como @RestController para evitar endpoints duplicados.
+// La versión activa vive en modules/orders/recepcion/api.
 @RequestMapping("GestorDeDepositos/detalleRecepcion")
 public class DetalleRecepcionController {
 
