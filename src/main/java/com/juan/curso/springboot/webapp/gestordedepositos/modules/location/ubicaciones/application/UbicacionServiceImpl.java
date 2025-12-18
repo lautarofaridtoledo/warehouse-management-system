@@ -5,7 +5,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoE
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.CategoriasProducto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UbicacionRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.GenericService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;

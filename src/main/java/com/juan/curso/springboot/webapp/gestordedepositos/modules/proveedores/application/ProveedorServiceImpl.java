@@ -3,7 +3,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.proveedores.a
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ProveedorRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.GenericService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

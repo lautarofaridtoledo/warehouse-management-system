@@ -8,7 +8,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.MovimientoInventarioRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ProductoRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UbicacionRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.GenericService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

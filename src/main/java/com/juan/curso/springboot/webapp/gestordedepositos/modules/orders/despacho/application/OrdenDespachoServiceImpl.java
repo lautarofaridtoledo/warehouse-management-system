@@ -9,7 +9,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.OrdenDespachoRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.ClienteServiceImpl;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.GenericService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.ProductoServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
 import org.springframework.stereotype.Service;

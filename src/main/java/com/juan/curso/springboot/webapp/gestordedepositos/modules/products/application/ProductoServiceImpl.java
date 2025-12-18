@@ -2,7 +2,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.products.appl
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ProductoRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.GenericService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

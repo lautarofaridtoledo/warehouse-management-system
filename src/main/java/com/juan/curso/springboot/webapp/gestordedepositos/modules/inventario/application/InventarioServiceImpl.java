@@ -5,7 +5,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespach
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.InventarioRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.GenericService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.ProductoServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.domain.StockDomainService;
 import org.springframework.beans.factory.annotation.Autowired;

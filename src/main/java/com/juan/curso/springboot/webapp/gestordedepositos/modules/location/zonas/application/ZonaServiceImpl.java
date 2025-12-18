@@ -3,7 +3,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zona
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Zona;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ZonaRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.GenericService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
