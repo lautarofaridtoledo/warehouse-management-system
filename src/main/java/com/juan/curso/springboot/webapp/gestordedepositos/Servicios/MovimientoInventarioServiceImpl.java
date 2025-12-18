@@ -25,11 +25,11 @@ import java.util.Optional;
 @Service("legacyMovimientoInventarioService")
 public class MovimientoInventarioServiceImpl implements GenericService<MovimientoInventario, Long> {
 
-    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.inventory.movimientos.application.MovimientoInventarioServiceImpl delegate;
+    private final com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.application.MovimientoInventarioServiceImpl delegate;
 
     @Autowired
     public MovimientoInventarioServiceImpl(
-            com.juan.curso.springboot.webapp.gestordedepositos.modules.inventory.movimientos.application.MovimientoInventarioServiceImpl delegate) {
+            com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.application.MovimientoInventarioServiceImpl delegate) {
         this.delegate = delegate;
     }
 

@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventory.movimientos.api;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.api;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.MovimientoInventarioDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.CapacidadExcedida;
@@ -7,7 +7,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.StockInsuf
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.MovimientoInventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
-import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventory.movimientos.application.MovimientoInventarioServiceImpl;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.application.MovimientoInventarioServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application.UbicacionServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;

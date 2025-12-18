@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventory.movimientos.application;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.application;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.MovimientoInventarioDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
