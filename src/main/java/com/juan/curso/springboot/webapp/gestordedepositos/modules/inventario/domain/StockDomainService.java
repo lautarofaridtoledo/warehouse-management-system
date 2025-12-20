@@ -7,9 +7,9 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.MovimientoInventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.InventarioRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.MovimientoInventarioRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UbicacionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.persistence.InventarioRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.persistence.MovimientoInventarioRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.persistence.UbicacionRepositorio;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

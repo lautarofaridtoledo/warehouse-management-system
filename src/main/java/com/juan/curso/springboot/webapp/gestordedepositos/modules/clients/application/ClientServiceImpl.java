@@ -2,7 +2,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.appli
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Cliente;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ClienteRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.persistence.ClienteRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

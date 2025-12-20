@@ -4,7 +4,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubica
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.CategoriasProducto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UbicacionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.persistence.UbicacionRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.stereotype.Service;
 

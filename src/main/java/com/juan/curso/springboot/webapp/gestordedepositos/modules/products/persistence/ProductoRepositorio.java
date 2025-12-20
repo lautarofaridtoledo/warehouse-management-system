@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.Repositorios;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.products.persistence;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import org.springframework.data.jpa.repository.JpaRepository;

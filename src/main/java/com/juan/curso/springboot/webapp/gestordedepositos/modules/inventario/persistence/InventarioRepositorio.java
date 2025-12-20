@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.Repositorios;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.persistence;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;

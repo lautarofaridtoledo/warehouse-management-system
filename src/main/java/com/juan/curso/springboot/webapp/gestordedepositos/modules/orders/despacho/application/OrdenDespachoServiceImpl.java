@@ -7,7 +7,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespach
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.OrdenDespachoRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.persistence.OrdenDespachoRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.application.ClientServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.domain.StockDomainService;

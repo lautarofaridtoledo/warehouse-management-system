@@ -2,7 +2,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.user
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Usuario;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UsuarioRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.persistence.UsuarioRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

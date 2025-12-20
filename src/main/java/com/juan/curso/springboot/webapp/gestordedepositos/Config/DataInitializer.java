@@ -2,8 +2,8 @@ package com.juan.curso.springboot.webapp.gestordedepositos.Config;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Usuario;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.RolRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UsuarioRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.persistence.RolRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.persistence.UsuarioRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

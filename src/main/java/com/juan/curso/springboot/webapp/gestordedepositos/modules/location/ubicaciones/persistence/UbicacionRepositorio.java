@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.Repositorios;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.persistence;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.CategoriasProducto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;

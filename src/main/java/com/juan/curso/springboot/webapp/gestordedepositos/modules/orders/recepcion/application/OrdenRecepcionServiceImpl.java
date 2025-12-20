@@ -8,7 +8,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosD
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenRecepcion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.OrdenRecepcionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.persistence.OrdenRecepcionRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.domain.StockDomainService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;

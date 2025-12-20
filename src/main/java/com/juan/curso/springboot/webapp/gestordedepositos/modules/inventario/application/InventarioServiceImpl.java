@@ -4,7 +4,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoE
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.InventarioRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.persistence.InventarioRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.domain.StockDomainService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;

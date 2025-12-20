@@ -5,9 +5,9 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoE
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.MovimientoInventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.MovimientoInventarioRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ProductoRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UbicacionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.persistence.MovimientoInventarioRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.persistence.UbicacionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.persistence.ProductoRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.domain.StockDomainService;
 import org.springframework.stereotype.Service;

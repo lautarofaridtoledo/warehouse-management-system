@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.Repositorios;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.persistence;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;

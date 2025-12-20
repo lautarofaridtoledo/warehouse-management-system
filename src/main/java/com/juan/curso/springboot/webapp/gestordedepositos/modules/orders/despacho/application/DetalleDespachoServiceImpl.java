@@ -2,7 +2,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despac
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespacho;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.DetalleDespachoRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.persistence.DetalleDespachoRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.stereotype.Service;
 

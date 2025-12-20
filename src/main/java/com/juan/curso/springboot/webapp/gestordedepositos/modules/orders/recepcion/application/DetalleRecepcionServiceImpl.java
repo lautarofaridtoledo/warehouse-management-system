@@ -2,7 +2,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepc
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleRecepcion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.DetalleRecepcionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.persistence.DetalleRecepcionRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.stereotype.Service;
 

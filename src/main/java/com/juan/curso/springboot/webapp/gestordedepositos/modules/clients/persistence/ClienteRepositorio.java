@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.Repositorios;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.persistence;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;

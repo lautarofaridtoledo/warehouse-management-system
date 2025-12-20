@@ -1,4 +1,4 @@
-package com.juan.curso.springboot.webapp.gestordedepositos.Repositorios;
+package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.persistence;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Usuario;
