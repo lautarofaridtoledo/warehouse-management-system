@@ -1,6 +1,5 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.application;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Usuario;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.persistence.UsuarioRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
@@ -80,7 +79,7 @@ public class UsuarioServiceImpl implements GenericService<Usuario, Long> {
     }
 
     @Transactional(readOnly = true)
-    public Optional<List<Usuario>> buscarPorRol(Rol rol) {
-        return Optional.ofNullable(usuarioRepositorio.getByRolEquals(rol));
+    public Optional<List<Usuario>> buscarPorRolId(Long rolId) {
+        return Optional.ofNullable(usuarioRepositorio.getByRolId(rolId));
     }
 }

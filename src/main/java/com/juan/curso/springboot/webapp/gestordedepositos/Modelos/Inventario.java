@@ -18,13 +18,12 @@ public class Inventario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idInventario;
-    @ManyToOne
-    @JoinColumn (name = "id_producto")
-    private Producto producto;
 
-    @ManyToOne
-    @JoinColumn (name = "id_ubicacion")
-    private Ubicacion ubicacion;
+    @Column(name = "id_producto", nullable = false)
+    private Long productoId;
+
+    @Column(name = "id_ubicacion", nullable = false)
+    private Long ubicacionId;
     private int cantidad;
     private Date fecha_actualizacion;
 

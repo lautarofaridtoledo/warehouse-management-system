@@ -63,7 +63,7 @@ public class DataInitializer implements CommandLineRunner {
             adminUser.setContrasenia(passwordEncoder.encode("admin123"));
             adminUser.setApellido("Administrador");
             adminUser.setEmail("admin@gestordepositos.com");
-            adminUser.setRol(adminRole);
+            adminUser.setRolId(adminRole.getId());
             
             usuarioRepositorio.save(adminUser);
             

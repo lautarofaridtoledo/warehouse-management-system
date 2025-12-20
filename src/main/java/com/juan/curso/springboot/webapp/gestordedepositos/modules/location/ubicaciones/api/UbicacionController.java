@@ -5,7 +5,6 @@ import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubica
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Zona;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application.UbicacionServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.application.ZonaServiceImpl;
@@ -55,12 +54,15 @@ public class UbicacionController {
     @PostMapping("/crear")
     @Operation(summary = "Este metodo crea una nueva ubicacion")
     public ResponseEntity<?> crear(@RequestBody UbicacionDTO dto) {
-        Zona zona = zonaService.buscarPorId(dto.getZona().getIdZona())
-                .orElseThrow(() -> new RuntimeException("Zona no encontrada con ID: " + dto.getZona().getIdZona()));
+        if (dto.getZonaId() == null) {
+            throw new IllegalArgumentException("Debe indicar zonaId");
+        }
+        zonaService.buscarPorId(dto.getZonaId())
+                .orElseThrow(() -> new RuntimeException("Zona no encontrada con ID: " + dto.getZonaId()));
 
         Ubicacion ubicacion = new Ubicacion();
         ubicacion.setCodigo(dto.getCodigo());
-        ubicacion.setZona(zona);
+        ubicacion.setZonaId(dto.getZonaId());
         ubicacion.setCapacidadMaxima(dto.getCapacidadMaxima());
         ubicacion.setOcupadoActual(dto.getOcupadoActual());
         ubicacion = ubicacionService.crear(ubicacion);
@@ -76,7 +78,12 @@ public class UbicacionController {
             Ubicacion ubicacion = existente.get();
 
             ubicacion.setCodigo(dto.getCodigo());
-            ubicacion.setZona(dto.getZona());
+            if (dto.getZonaId() == null) {
+                throw new IllegalArgumentException("Debe indicar zonaId");
+            }
+            zonaService.buscarPorId(dto.getZonaId())
+                    .orElseThrow(() -> new RuntimeException("Zona no encontrada con ID: " + dto.getZonaId()));
+            ubicacion.setZonaId(dto.getZonaId());
             ubicacion.setCapacidadMaxima(dto.getCapacidadMaxima());
             ubicacion.setOcupadoActual(dto.getOcupadoActual());
 
@@ -94,7 +101,7 @@ public class UbicacionController {
         Optional<Ubicacion> ubicacionEncontrada = ubicacionService.buscarPorId(id);
         if (ubicacionEncontrada.isPresent()) {
             List<Inventario> inventariosConEsaUbicacion = inventarioService.buscarTodos().get().stream().filter(
-                    inventario -> Objects.equals(inventario.getUbicacion().getIdUbicacion(), ubicacionEncontrada.get().getIdUbicacion())
+            inventario -> Objects.equals(inventario.getUbicacionId(), ubicacionEncontrada.get().getIdUbicacion())
             ).collect(Collectors.toList());
             if (inventariosConEsaUbicacion.size() > 0) {
                 throw new Exception("No se puede eliminar la ubicacion porque esta asignada a un inventario");

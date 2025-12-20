@@ -17,17 +17,14 @@ public class MovimientoInventario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idMovimientoInventario;
 
-    @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
-    private Producto producto;
+    @Column(name = "id_producto", nullable = false)
+    private Long productoId;
 
-    @ManyToOne
-    @JoinColumn(name = "id_ubicacion_origen", nullable = true)
-    private Ubicacion ubicacionOrigen;
+    @Column(name = "id_ubicacion_origen")
+    private Long ubicacionOrigenId;
 
-    @ManyToOne
-    @JoinColumn(name = "id_ubicacion_destino", nullable = true)
-    private Ubicacion ubicacionDestino;
+    @Column(name = "id_ubicacion_destino")
+    private Long ubicacionDestinoId;
 
     private int cantidad;
 

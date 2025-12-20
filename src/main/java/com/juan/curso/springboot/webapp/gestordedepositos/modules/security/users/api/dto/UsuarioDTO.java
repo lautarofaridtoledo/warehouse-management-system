@@ -23,6 +23,6 @@ public class UsuarioDTO {
         this.nombre = usuario.getNombre();
         this.apellido = usuario.getApellido();
         this.email = usuario.getEmail();
-        this.idRol = usuario.getRol() != null ? usuario.getRol().getId() : null;
+        this.idRol = usuario.getRolId();
     }
 }

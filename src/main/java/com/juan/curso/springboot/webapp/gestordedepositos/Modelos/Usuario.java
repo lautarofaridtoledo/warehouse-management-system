@@ -31,8 +31,8 @@ public class Usuario {
     @Email
     @Column(unique = true, nullable = false)
     private String email;
-    @ManyToOne
-    @JoinColumn(name = "id_rol", nullable = false)
-    private Rol rol;
+
+    @Column(name = "id_rol", nullable = false)
+    private Long rolId;
 
 }

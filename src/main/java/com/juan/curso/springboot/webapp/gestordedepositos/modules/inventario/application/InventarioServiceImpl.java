@@ -76,11 +76,15 @@ public class InventarioServiceImpl implements GenericService<Inventario, Long> {
         String sku = productoService.buscarPorId(idProducto)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"))
                 .getCodigoSku();
-        return inventarioRepositorio.findAllByProducto_CodigoSku(sku);
+        return inventarioRepositorio.findAllByProductoId(idProducto);
     }
 
     public List<Inventario> buscarPorCodigoSku(String codigoSku) {
-        return inventarioRepositorio.findAllByProducto_CodigoSku(codigoSku);
+        Producto producto = productoService.buscarPorCodigoSKU(codigoSku);
+        if (producto == null) {
+            return List.of();
+        }
+        return inventarioRepositorio.findAllByProductoId(producto.getIdProducto());
     }
 
     public int calcularStockTotalPorIdProducto(Long idProducto) {

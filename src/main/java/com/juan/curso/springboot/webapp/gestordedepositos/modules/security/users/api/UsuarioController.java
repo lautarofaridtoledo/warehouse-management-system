@@ -3,7 +3,6 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.user
 import com.juan.curso.springboot.webapp.gestordedepositos.Config.PasswordEncoderConfig;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.api.dto.UsuarioDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Usuario;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.application.RolServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.application.UsuarioServiceImpl;
@@ -34,7 +33,11 @@ public class UsuarioController {
     @PostMapping("/crear")
     @Operation(summary = "Este metodo crea un usuario")
     public ResponseEntity<UsuarioDTO> crearUsuario(@RequestBody UsuarioDTO usuarioDTO) {
-        Rol rol = rolService.buscarPorId(usuarioDTO.getIdRol())
+        Long rolId = usuarioDTO.getIdRol();
+        if (rolId == null) {
+            throw new IllegalArgumentException("El rol es obligatorio.");
+        }
+        rolService.buscarPorId(rolId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("El Rol seleccionado no existe."));
 
         Usuario usuario = new Usuario();
@@ -44,7 +47,7 @@ public class UsuarioController {
         usuario.setContrasenia(contraseniaEncriptada);
         usuario.setApellido(usuarioDTO.getApellido());
         usuario.setEmail(usuarioDTO.getEmail());
-        usuario.setRol(rol);
+    usuario.setRolId(rolId);
 
         Usuario nuevoUsuario = usuarioService.crear(usuario);
 
@@ -66,9 +69,9 @@ public class UsuarioController {
         u.setEmail(usuarioDTO.getEmail());
 
         if (usuarioDTO.getIdRol() != null) {
-            Rol rol = rolService.buscarPorId(usuarioDTO.getIdRol())
+            rolService.buscarPorId(usuarioDTO.getIdRol())
                     .orElseThrow(() -> new RecursoNoEncontradoException("El Rol especificado no existe."));
-            u.setRol(rol);
+            u.setRolId(usuarioDTO.getIdRol());
         }
 
         Usuario usuarioActualizado = usuarioService.actualizar(u);
@@ -108,10 +111,10 @@ public class UsuarioController {
     @GetMapping("/buscarPorRol")
     @Operation(summary = "Este metodo busca usuarios por rol")
     public ResponseEntity<List<UsuarioDTO>> buscarPorRol(@RequestParam Long idRol) {
-        Rol rol = rolService.buscarPorId(idRol)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado."));
+    rolService.buscarPorId(idRol)
+        .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado."));
 
-        List<Usuario> usuarios = usuarioService.buscarPorRol(rol)
+    List<Usuario> usuarios = usuarioService.buscarPorRolId(idRol)
                 .orElse(List.of());
 
         List<UsuarioDTO> dtos = usuarios.stream()

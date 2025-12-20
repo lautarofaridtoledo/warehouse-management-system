@@ -58,6 +58,21 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
     }
 
     @Override
+    @Transactional
+    public MovimientoInventario transferirStock(Long productoId, Long ubicacionOrigenId, Long ubicacionDestinoId, int cantidad) {
+    Producto producto = productoService.buscarPorId(productoId)
+        .orElseThrow(() -> new StockInsuficienteException("Producto no encontrado con ID: " + productoId));
+
+    Ubicacion origen = ubicacionRepositorio.findById(ubicacionOrigenId)
+        .orElseThrow(() -> new StockInsuficienteException("Ubicación origen no encontrada con ID: " + ubicacionOrigenId));
+
+    Ubicacion destino = ubicacionRepositorio.findById(ubicacionDestinoId)
+        .orElseThrow(() -> new StockInsuficienteException("Ubicación destino no encontrada con ID: " + ubicacionDestinoId));
+
+    return transferirStock(producto, origen, destino, cantidad);
+    }
+
+    @Override
     public int calcularStockTotal(Long productoId) {
         Producto producto = productoService.buscarPorId(productoId)
                 .orElseThrow(() -> new StockInsuficienteException("Producto no encontrado con ID: " + productoId));
@@ -150,7 +165,7 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
         validarCantidadPositiva(cantidadTotal);
 
         List<Inventario> inventarios = inventarioRepositorio
-                .findAllByProducto_IdProducto(producto.getIdProducto());
+                .findAllByProductoId(producto.getIdProducto());
 
         int pendiente = cantidadTotal;
 
@@ -164,7 +179,9 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
             inv.setFecha_actualizacion(new Date());
             inventarioRepositorio.save(inv);
 
-            Ubicacion ubicacion = inv.getUbicacion();
+        Ubicacion ubicacion = ubicacionRepositorio.findById(inv.getUbicacionId())
+            .orElseThrow(() -> new StockInsuficienteException(
+                "Ubicación no encontrada con ID: " + inv.getUbicacionId()));
             ubicacion.setOcupadoActual(Math.max(0, ubicacion.getOcupadoActual() - aRetirar));
             ubicacionRepositorio.save(ubicacion);
 
@@ -187,12 +204,14 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
         int restante = cantidadTotal;
 
         List<Inventario> existentes = inventarioRepositorio
-                .findAllByProducto_IdProducto(producto.getIdProducto());
+        .findAllByProductoId(producto.getIdProducto());
 
         for (Inventario inv : existentes) {
             if (restante <= 0) break;
 
-            Ubicacion ubicacion = inv.getUbicacion();
+        Ubicacion ubicacion = ubicacionRepositorio.findById(inv.getUbicacionId())
+            .orElseThrow(() -> new StockInsuficienteException(
+                "Ubicación no encontrada con ID: " + inv.getUbicacionId()));
             int espacioLibre = ubicacion.getCapacidadMaxima() - ubicacion.getOcupadoActual();
 
             if (espacioLibre > 0) {
@@ -211,9 +230,12 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
             }
         }
 
-        while (restante > 0) {
-            List<Ubicacion> disponibles = ubicacionRepositorio.buscarUbicacionesPorCategoriaYEspacio(
-                    producto.getCategoria(), 1);
+    while (restante > 0) {
+        // Hard boundary: ya no existe query por JOIN a Zona. Usamos una estrategia simple:
+        // tomar cualquier ubicación con al menos 1 unidad de espacio libre.
+        List<Ubicacion> disponibles = ubicacionRepositorio.findAll().stream()
+            .filter(u -> (u.getCapacidadMaxima() - u.getOcupadoActual()) >= 1)
+            .toList();
 
             if (disponibles.isEmpty()) {
                 throw new CapacidadExcedida(
@@ -226,8 +248,8 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
             int aIngresar = Math.min(espacioLibre, restante);
 
             Inventario nuevoInv = new Inventario();
-            nuevoInv.setProducto(producto);
-            nuevoInv.setUbicacion(ubicacion);
+            nuevoInv.setProductoId(producto.getIdProducto());
+            nuevoInv.setUbicacionId(ubicacion.getIdUbicacion());
             nuevoInv.setCantidad(aIngresar);
             nuevoInv.setFecha_actualizacion(new Date());
             inventarioRepositorio.save(nuevoInv);
@@ -242,7 +264,7 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
     }
 
     public int calcularStockTotal(Producto producto) {
-        return inventarioRepositorio.findAllByProducto_IdProducto(producto.getIdProducto())
+        return inventarioRepositorio.findAllByProductoId(producto.getIdProducto())
                 .stream()
                 .mapToInt(Inventario::getCantidad)
                 .sum();
@@ -253,15 +275,15 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
     }
 
     private Optional<Inventario> buscarInventario(Producto producto, Ubicacion ubicacion) {
-        return inventarioRepositorio.findByProductoAndUbicacion(producto, ubicacion);
+        return inventarioRepositorio.findByProductoIdAndUbicacionId(producto.getIdProducto(), ubicacion.getIdUbicacion());
     }
 
     private Inventario buscarOCrearInventario(Producto producto, Ubicacion ubicacion) {
-        return inventarioRepositorio.findByProductoAndUbicacion(producto, ubicacion)
+        return inventarioRepositorio.findByProductoIdAndUbicacionId(producto.getIdProducto(), ubicacion.getIdUbicacion())
                 .orElseGet(() -> {
                     Inventario inv = new Inventario();
-                    inv.setProducto(producto);
-                    inv.setUbicacion(ubicacion);
+                    inv.setProductoId(producto.getIdProducto());
+                    inv.setUbicacionId(ubicacion.getIdUbicacion());
                     inv.setCantidad(0);
                     inv.setFecha_actualizacion(new Date());
                     return inv;
@@ -289,9 +311,9 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
                                                     int cantidad,
                                                     EstadoMovimientoInventario estado) {
         MovimientoInventario movimiento = new MovimientoInventario();
-        movimiento.setProducto(producto);
-        movimiento.setUbicacionOrigen(origen);
-        movimiento.setUbicacionDestino(destino);
+        movimiento.setProductoId(producto != null ? producto.getIdProducto() : null);
+        movimiento.setUbicacionOrigenId(origen != null ? origen.getIdUbicacion() : null);
+        movimiento.setUbicacionDestinoId(destino != null ? destino.getIdUbicacion() : null);
         movimiento.setCantidad(cantidad);
         movimiento.setFecha(new Date());
         movimiento.setEstado(estado);

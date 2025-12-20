@@ -4,8 +4,6 @@ import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.api
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.CapacidadExcedida;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application.UbicacionServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;
@@ -96,7 +94,15 @@ public class InventarioController {
     public ResponseEntity<InventarioDTO> crear(@RequestBody InventarioDTO inventarioDTO) {
         Inventario inventario = new Inventario();
 
-        Ubicacion ubicacion = ubicacionService.buscarPorId(inventarioDTO.getUbicacion().getIdUbicacion())
+        if (inventarioDTO.getUbicacionId() == null) {
+            throw new IllegalArgumentException("Debe indicar ubicacionId");
+        }
+
+        if (inventarioDTO.getProductoId() == null) {
+            throw new IllegalArgumentException("Debe indicar productoId");
+        }
+
+        var ubicacion = ubicacionService.buscarPorId(inventarioDTO.getUbicacionId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación no encontrada"));
 
         int espacioDisponible = ubicacion.getCapacidadMaxima() - ubicacion.getOcupadoActual();
@@ -104,12 +110,11 @@ public class InventarioController {
             throw new CapacidadExcedida("La ubicación no tiene capacidad suficiente. Disponible: " + espacioDisponible);
         }
 
-        inventario.setUbicacion(ubicacion);
+    productoService.buscarPorId(inventarioDTO.getProductoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
-        Producto producto = productoService.buscarPorId(inventarioDTO.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
-
-        inventario.setProducto(producto);
+    inventario.setUbicacionId(inventarioDTO.getUbicacionId());
+    inventario.setProductoId(inventarioDTO.getProductoId());
         inventario.setCantidad(inventarioDTO.getCantidad());
         inventario.setFecha_actualizacion(Calendar.getInstance().getTime());
 
@@ -128,14 +133,23 @@ public class InventarioController {
         Inventario inventarioExistente = inventarioService.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
 
-        Ubicacion ubicacionAnterior = inventarioExistente.getUbicacion();
+    if (inventarioDTO.getUbicacionId() == null) {
+        throw new IllegalArgumentException("Debe indicar ubicacionId");
+    }
+
+    if (inventarioDTO.getProductoId() == null) {
+        throw new IllegalArgumentException("Debe indicar productoId");
+    }
+
+    var ubicacionAnterior = ubicacionService.buscarPorId(inventarioExistente.getUbicacionId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación anterior no encontrada"));
         int cantidadAnterior = inventarioExistente.getCantidad();
 
-        Ubicacion ubicacionNueva = ubicacionService.buscarPorId(inventarioDTO.getUbicacion().getIdUbicacion())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación nueva no encontrada"));
+    var ubicacionNueva = ubicacionService.buscarPorId(inventarioDTO.getUbicacionId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación nueva no encontrada"));
 
-        Producto producto = productoService.buscarPorId(inventarioDTO.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+    productoService.buscarPorId(inventarioDTO.getProductoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
         int cantidadNueva = inventarioDTO.getCantidad();
 
@@ -171,8 +185,8 @@ public class InventarioController {
         }
 
         inventarioExistente.setCantidad(cantidadNueva);
-        inventarioExistente.setUbicacion(ubicacionNueva);
-        inventarioExistente.setProducto(producto);
+    inventarioExistente.setUbicacionId(inventarioDTO.getUbicacionId());
+    inventarioExistente.setProductoId(inventarioDTO.getProductoId());
         inventarioExistente.setFecha_actualizacion(Calendar.getInstance().getTime());
 
         Inventario actualizado = inventarioService.actualizar(inventarioExistente);
@@ -186,7 +200,8 @@ public class InventarioController {
         Inventario inventario = inventarioService.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
 
-        Ubicacion ubicacion = inventario.getUbicacion();
+    var ubicacion = ubicacionService.buscarPorId(inventario.getUbicacionId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación no encontrada"));
 
         int nuevoOcupado = Math.max(0, ubicacion.getOcupadoActual() - inventario.getCantidad());
         ubicacion.setOcupadoActual(nuevoOcupado);

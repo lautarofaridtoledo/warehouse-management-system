@@ -97,7 +97,13 @@ public class UbicacionServiceImpl implements GenericService<Ubicacion, Long> {
     }
 
     public Ubicacion buscarMejorUbicacion(CategoriasProducto categoria, int cantidad) {
-        List<Ubicacion> candidatos = ubicacionRepositorio.buscarUbicacionesPorCategoriaYEspacio(categoria, cantidad);
+    // Hard boundary: Ubicacion ya no tiene relación directa con Zona (solo zonaId),
+    // así que no podemos hacer JOIN a Zona en el repositorio.
+    // Estrategia simple: elegir entre todas las ubicaciones la que tenga espacio suficiente.
+    // (Mantiene el comportamiento funcional básico; el filtrado por categoría/zona queda como mejora futura.)
+    List<Ubicacion> candidatos = ubicacionRepositorio.findAll().stream()
+        .filter(u -> (u.getCapacidadMaxima() - u.getOcupadoActual()) >= cantidad)
+        .toList();
 
         if (candidatos.isEmpty()) {
             throw new RuntimeException("No hay espacio disponible en ninguna Zona habilitada para " + categoria);

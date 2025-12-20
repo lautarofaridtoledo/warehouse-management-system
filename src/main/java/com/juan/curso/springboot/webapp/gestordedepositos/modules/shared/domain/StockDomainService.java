@@ -19,6 +19,11 @@ public interface StockDomainService {
 
     MovimientoInventario transferirStock(Producto producto, Ubicacion origen, Ubicacion destino, int cantidad);
 
+    /**
+     * Variante boundary-safe: opera usando IDs (sin relaciones JPA cross-module).
+     */
+    MovimientoInventario transferirStock(Long productoId, Long ubicacionOrigenId, Long ubicacionDestinoId, int cantidad);
+
     void retirarStockDistribuido(Producto producto, int cantidadTotal);
 
     void retirarStockDistribuido(Long productoId, int cantidadTotal);

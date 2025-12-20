@@ -2,8 +2,6 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.mo
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadoMovimientoInventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.MovimientoInventario;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,18 +15,18 @@ import java.util.Date;
 @AllArgsConstructor
 public class MovimientoInventarioDTO {
     private Long idMovimientoInventario;
-    private Producto producto;
-    private Ubicacion ubicacionOrigen;
-    private Ubicacion ubicacionDestino;
+    private Long productoId;
+    private Long ubicacionOrigenId;
+    private Long ubicacionDestinoId;
     private int cantidad;
     private EstadoMovimientoInventario estado;
     private Date fecha;
 
     public MovimientoInventarioDTO(MovimientoInventario movimientoInventario) {
         this.idMovimientoInventario = movimientoInventario.getIdMovimientoInventario();
-        this.producto = movimientoInventario.getProducto();
-        this.ubicacionOrigen = movimientoInventario.getUbicacionOrigen();
-        this.ubicacionDestino = movimientoInventario.getUbicacionDestino();
+        this.productoId = movimientoInventario.getProductoId();
+        this.ubicacionOrigenId = movimientoInventario.getUbicacionOrigenId();
+        this.ubicacionDestinoId = movimientoInventario.getUbicacionDestinoId();
         this.cantidad = movimientoInventario.getCantidad();
         this.estado = movimientoInventario.getEstado();
         this.fecha = movimientoInventario.getFecha();

@@ -5,7 +5,6 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.CapacidadE
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.StockInsuficienteException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.MovimientoInventario;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.application.MovimientoInventarioServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application.UbicacionServiceImpl;
@@ -59,14 +58,15 @@ public class MovimientoInventarioController {
             throw new IllegalArgumentException("La fecha del movimiento no puede ser futura");
         }
 
-        Producto producto = productoService.buscarPorId(dto.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+    // validar existencia
+    productoService.buscarPorId(dto.getProductoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
-        Ubicacion origen = ubicacionService.buscarPorId(dto.getUbicacionOrigen().getIdUbicacion())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación origen no encontrada"));
+    Ubicacion origen = ubicacionService.buscarPorId(dto.getUbicacionOrigenId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación origen no encontrada"));
 
-        Ubicacion destino = ubicacionService.buscarPorId(dto.getUbicacionDestino().getIdUbicacion())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación destino no encontrada"));
+    Ubicacion destino = ubicacionService.buscarPorId(dto.getUbicacionDestinoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación destino no encontrada"));
 
         int cantidad = dto.getCantidad();
 
@@ -84,8 +84,14 @@ public class MovimientoInventarioController {
         ubicacionService.actualizar(destino);
 
         Date fechaMovimiento = dto.getFecha() != null ? dto.getFecha() : new Date();
-        MovimientoInventario movInventario = new MovimientoInventario(
-                dto.getIdMovimientoInventario(), producto, origen, destino, cantidad, fechaMovimiento, dto.getEstado());
+    MovimientoInventario movInventario = new MovimientoInventario();
+    movInventario.setIdMovimientoInventario(dto.getIdMovimientoInventario());
+    movInventario.setProductoId(dto.getProductoId());
+    movInventario.setUbicacionOrigenId(dto.getUbicacionOrigenId());
+    movInventario.setUbicacionDestinoId(dto.getUbicacionDestinoId());
+    movInventario.setCantidad(cantidad);
+    movInventario.setFecha(fechaMovimiento);
+    movInventario.setEstado(dto.getEstado());
 
         MovimientoInventario creado = movimientoService.crear(movInventario);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MovimientoInventarioDTO(creado));
@@ -111,18 +117,19 @@ public class MovimientoInventarioController {
         MovimientoInventario movimiento = movimientoService.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Movimiento de inventario no encontrado con ID: " + id));
 
-        Ubicacion origenNuevo = ubicacionService.buscarPorId(dto.getUbicacionOrigen().getIdUbicacion())
+    Ubicacion origenNuevo = ubicacionService.buscarPorId(dto.getUbicacionOrigenId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación origen no encontrada"));
 
-        Ubicacion destinoNuevo = ubicacionService.buscarPorId(dto.getUbicacionDestino().getIdUbicacion())
+    Ubicacion destinoNuevo = ubicacionService.buscarPorId(dto.getUbicacionDestinoId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación destino no encontrada"));
 
-        Producto producto = productoService.buscarPorId(dto.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+    // validar producto
+    productoService.buscarPorId(dto.getProductoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
-        Ubicacion origenAnterior = ubicacionService.buscarPorId(movimiento.getUbicacionOrigen().getIdUbicacion())
+    Ubicacion origenAnterior = ubicacionService.buscarPorId(movimiento.getUbicacionOrigenId())
                 .orElse(origenNuevo);
-        Ubicacion destinoAnterior = ubicacionService.buscarPorId(movimiento.getUbicacionDestino().getIdUbicacion())
+    Ubicacion destinoAnterior = ubicacionService.buscarPorId(movimiento.getUbicacionDestinoId())
                 .orElse(destinoNuevo);
 
         if (origenNuevo.getIdUbicacion().equals(origenAnterior.getIdUbicacion())) {
@@ -167,9 +174,9 @@ public class MovimientoInventarioController {
             ubicacionService.actualizar(ubicacion);
         }
 
-        movimiento.setProducto(producto);
-        movimiento.setUbicacionOrigen(origenNuevo);
-        movimiento.setUbicacionDestino(destinoNuevo);
+    movimiento.setProductoId(dto.getProductoId());
+    movimiento.setUbicacionOrigenId(dto.getUbicacionOrigenId());
+    movimiento.setUbicacionDestinoId(dto.getUbicacionDestinoId());
         movimiento.setCantidad(cantidadNueva);
         movimiento.setEstado(dto.getEstado());
         movimiento.setFecha(dto.getFecha() != null ? dto.getFecha() : movimiento.getFecha());
@@ -186,8 +193,8 @@ public class MovimientoInventarioController {
     }
 
     private void validarPayloadMovimiento(MovimientoInventarioDTO dto) {
-        if (dto == null || dto.getProducto() == null || dto.getUbicacionOrigen() == null
-                || dto.getUbicacionDestino() == null || dto.getCantidad() <= 0) {
+        if (dto == null || dto.getProductoId() == null || dto.getUbicacionOrigenId() == null
+                || dto.getUbicacionDestinoId() == null || dto.getCantidad() <= 0) {
             throw new IllegalArgumentException("Payload incompleto o cantidad inválida");
         }
     }

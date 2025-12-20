@@ -12,14 +12,9 @@ import java.util.List;
 @Repository
 public interface UbicacionRepositorio extends JpaRepository<Ubicacion, Long> {
     List<Ubicacion> findByCapacidadMaximaGreaterThanEqual(int cantidad);
-    @Query("SELECT u FROM Ubicacion u " +
-            "JOIN u.zona z " +
-            "JOIN z.categoriasAdmitidas c " +
-            "WHERE c = :categoria " +
-            "AND (u.capacidadMaxima - u.ocupadoActual) >= :cantidad " +  // <-- AQUI ESTA EL CAMBIO
-            "ORDER BY (u.capacidadMaxima - u.ocupadoActual) ASC") // Orden ASC para 'Best Fit' (llenar huecos pequeños primero)
-    List<Ubicacion> buscarUbicacionesPorCategoriaYEspacio(
-            @Param("categoria") CategoriasProducto categoria,
-            @Param("cantidad") int cantidad
-    );
+        // NOTE: deshabilitado temporalmente por corte hard de Ubicacion->Zona.
+        // Si se necesita filtrar por categorías admitidas, esto debe resolverse vía un
+        // query service en el módulo de zonas o una tabla/materialización explícita.
+        // @Query( ... JOIN zona ... )
+        // List<Ubicacion> buscarUbicacionesPorCategoriaYEspacio(...)
 }

@@ -3,8 +3,6 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.mo
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.api.dto.MovimientoInventarioDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.MovimientoInventario;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.persistence.MovimientoInventarioRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.persistence.UbicacionRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.persistence.ProductoRepositorio;
@@ -48,16 +46,19 @@ public class MovimientoInventarioServiceImpl implements GenericService<Movimient
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
         }
 
-        Producto producto = productoRepositorio.findById(dto.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+    if (dto.getProductoId() == null || dto.getUbicacionOrigenId() == null || dto.getUbicacionDestinoId() == null) {
+        throw new IllegalArgumentException("El movimiento requiere productoId, ubicacionOrigenId y ubicacionDestinoId");
+    }
 
-        Ubicacion origen = ubicacionRepositorio.findById(dto.getUbicacionOrigen().getIdUbicacion())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación origen no encontrada"));
+    // validación de existencia (evita transferencias a IDs inexistentes)
+    productoRepositorio.findById(dto.getProductoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+    ubicacionRepositorio.findById(dto.getUbicacionOrigenId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación origen no encontrada"));
+    ubicacionRepositorio.findById(dto.getUbicacionDestinoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación destino no encontrada"));
 
-        Ubicacion destino = ubicacionRepositorio.findById(dto.getUbicacionDestino().getIdUbicacion())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación destino no encontrada"));
-
-        return stockDomainService.transferirStock(producto, origen, destino, dto.getCantidad());
+    return stockDomainService.transferirStock(dto.getProductoId(), dto.getUbicacionOrigenId(), dto.getUbicacionDestinoId(), dto.getCantidad());
     }
 
     /**
@@ -68,12 +69,12 @@ public class MovimientoInventarioServiceImpl implements GenericService<Movimient
         MovimientoInventario movimiento = buscarPorId(idMovimiento)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Movimiento no encontrado"));
 
-        stockDomainService.transferirStock(
-                movimiento.getProducto(),
-                movimiento.getUbicacionDestino(),
-                movimiento.getUbicacionOrigen(),
-                movimiento.getCantidad()
-        );
+    stockDomainService.transferirStock(
+        movimiento.getProductoId(),
+        movimiento.getUbicacionDestinoId(),
+        movimiento.getUbicacionOrigenId(),
+        movimiento.getCantidad()
+    );
 
         movimientoRepositorio.delete(movimiento);
     }

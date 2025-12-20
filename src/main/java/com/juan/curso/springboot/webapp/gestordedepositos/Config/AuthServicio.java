@@ -27,8 +27,12 @@ public class AuthServicio  implements UserDetailsService {
         if(usuario == null){
             throw new UsernameNotFoundException("Usuario no encontrado: " + email);
         }
-
-        Rol rol = usuario.getRol();
+    Long rolId = usuario.getRolId();
+    if (rolId == null) {
+        throw new UsernameNotFoundException("Usuario sin rol asignado: " + email);
+    }
+    Rol rol = rolRepositorio.findById(rolId)
+        .orElseThrow(() -> new UsernameNotFoundException("Rol no encontrado para usuario: " + email));
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(usuario.getEmail())

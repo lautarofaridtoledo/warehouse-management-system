@@ -21,9 +21,9 @@ public class Ubicacion {
     private Long idUbicacion;
     @NotBlank
     private String codigo;
-    @ManyToOne
-    @JoinColumn (name = "id_zona")
-    private Zona zona;
+
+    @Column(name = "id_zona", nullable = false)
+    private Long zonaId;
     @NotNull
     @Column(name= "capacidad_maxima")
     private int capacidadMaxima;
