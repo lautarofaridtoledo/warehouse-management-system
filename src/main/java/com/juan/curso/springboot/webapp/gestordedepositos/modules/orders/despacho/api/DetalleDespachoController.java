@@ -6,7 +6,6 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.StockInsuf
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenDespacho;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.application.DetalleDespachoServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.application.OrdenDespachoServiceImpl;
@@ -63,11 +62,15 @@ public class DetalleDespachoController {
     @PostMapping("/crear")
     @Operation(summary = "Este metodo crea un detalle de despacho. Valida que el producto y el inventario existan como tambien la orden a la que se quiere agregar el detalle")
     public ResponseEntity<DetalleDespachoDTO> crear(@RequestBody DetalleDespachoDTO dto) {
-        Producto producto = productoService.buscarPorId(dto.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+    if (dto.getProductoId() == null) {
+        throw new IllegalArgumentException("Debe indicar productoId");
+    }
 
-        Inventario inventario = inventarioService.buscarPorId(dto.getProducto().getIdProducto())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
+    productoService.buscarPorId(dto.getProductoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+
+    Inventario inventario = inventarioService.buscarPorId(dto.getProductoId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
 
         if (dto.getCantidad() > inventario.getCantidad()) {
             throw new StockInsuficienteException("Cantidad insuficiente en inventario");
@@ -76,8 +79,8 @@ public class DetalleDespachoController {
         OrdenDespacho orden = ordenDespachoService.buscarPorId(dto.getOrdenDespacho().getIdOrdenDespacho())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Orden no encontrada"));
 
-        DetalleDespacho detalle = new DetalleDespacho();
-        detalle.setProducto(producto);
+    DetalleDespacho detalle = new DetalleDespacho();
+    detalle.setProductoId(dto.getProductoId());
         detalle.setOrdenDespacho(orden);
         detalle.setCantidad(dto.getCantidad());
 
@@ -93,11 +96,15 @@ public class DetalleDespachoController {
         DetalleDespacho detalle = detalleDespachoService.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Detalle no encontrado con ID: " + id));
 
-        List<Inventario> inventarios = inventarioService.buscarInventariosPorIdProducto(dto.getProducto().getIdProducto());
+        if (dto.getProductoId() == null) {
+            throw new IllegalArgumentException("Debe indicar productoId");
+        }
+
+        List<Inventario> inventarios = inventarioService.buscarInventariosPorIdProducto(dto.getProductoId());
 
         if (inventarios.isEmpty()) {
             throw new RecursoNoEncontradoException(
-                    "No existe inventario con el producto " + dto.getProducto().getNombre());
+                    "No existe inventario para el productoId " + dto.getProductoId());
         }
 
         inventarios.stream()
@@ -105,7 +112,7 @@ public class DetalleDespachoController {
                 .findFirst()
                 .orElseThrow(() -> new StockInsuficienteException("Cantidad insuficiente en inventario"));
 
-        detalle.setProducto(dto.getProducto());
+    detalle.setProductoId(dto.getProductoId());
         detalle.setCantidad(dto.getCantidad());
 
         detalleDespachoService.crear(detalle);

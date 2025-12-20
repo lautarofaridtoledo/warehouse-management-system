@@ -2,11 +2,9 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despac
 
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.api.dto.OrdenDespachoDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Cliente;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenDespacho;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.persistence.OrdenDespachoRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.application.ClientServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
@@ -74,32 +72,35 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
 
     @Transactional(rollbackFor = Exception.class)
     public OrdenDespacho procesarSalidaMercaderia(OrdenDespachoDTO dto) {
-        Cliente cliente = clienteService.buscarPorId(dto.getCliente().getIdCliente())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado"));
+        Long clienteId = dto.getClienteId();
+        if (clienteId == null || !clienteService.ExistePorIdCliente(clienteId)) {
+            throw new RecursoNoEncontradoException("Cliente no encontrado");
+        }
 
         OrdenDespacho orden = new OrdenDespacho();
-        orden.setCliente(cliente);
+    orden.setClienteId(clienteId);
         orden.setFechaDespacho(dto.getFechaDespacho());
         orden.setEstado(dto.getEstado());
 
         List<DetalleDespacho> detalles = new ArrayList<>();
 
         for (var detalleDto : dto.getDetalle_despacho()) {
-            Producto producto = productoService.buscarPorId(detalleDto.getProducto().getIdProducto())
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
-
-            if (!stockDomainService.hayStockSuficiente(producto, detalleDto.getCantidad())) {
-                throw new RuntimeException("Stock insuficiente para " + producto.getNombre() +
-                        ". Disponible: " + stockDomainService.calcularStockTotal(producto));
+            Long productoId = detalleDto.getProductoId();
+            if (productoId == null || !productoService.ExistePorIdProducto(productoId)) {
+                throw new RecursoNoEncontradoException("Producto no encontrado");
+            }
+            if (!stockDomainService.hayStockSuficiente(productoId, detalleDto.getCantidad())) {
+                throw new RuntimeException("Stock insuficiente para productoId=" + productoId +
+                        ". Disponible: " + stockDomainService.calcularStockTotal(productoId));
             }
 
             DetalleDespacho detalle = new DetalleDespacho();
-            detalle.setProducto(producto);
+            detalle.setProductoId(productoId);
             detalle.setCantidad(detalleDto.getCantidad());
             detalle.setOrdenDespacho(orden);
             detalles.add(detalle);
 
-            stockDomainService.retirarStockDistribuido(producto, detalleDto.getCantidad());
+            stockDomainService.retirarStockDistribuido(productoId, detalleDto.getCantidad());
         }
 
         orden.setDetalleDespacho(detalles);
@@ -116,13 +117,15 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
         }
 
         for (DetalleDespacho detalleViejo : ordenActual.getDetalleDespacho()) {
-            stockDomainService.ingresarStockDistribuido(detalleViejo.getProducto(), detalleViejo.getCantidad());
+            stockDomainService.ingresarStockDistribuido(detalleViejo.getProductoId(), detalleViejo.getCantidad());
         }
 
-        Cliente cliente = clienteService.buscarPorId(dto.getCliente().getIdCliente())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado"));
+        Long clienteId = dto.getClienteId();
+        if (clienteId == null || !clienteService.ExistePorIdCliente(clienteId)) {
+            throw new RecursoNoEncontradoException("Cliente no encontrado");
+        }
 
-        ordenActual.setCliente(cliente);
+        ordenActual.setClienteId(clienteId);
         ordenActual.setFechaDespacho(dto.getFechaDespacho());
         ordenActual.setEstado(dto.getEstado());
 
@@ -132,16 +135,18 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
         List<DetalleDespacho> nuevosDetalles = new ArrayList<>();
 
         for (var detalleDto : dto.getDetalle_despacho()) {
-            Producto producto = productoService.buscarPorId(detalleDto.getProducto().getIdProducto())
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+            Long productoId = detalleDto.getProductoId();
+            if (productoId == null || !productoService.ExistePorIdProducto(productoId)) {
+                throw new RecursoNoEncontradoException("Producto no encontrado");
+            }
 
             DetalleDespacho detalle = new DetalleDespacho();
-            detalle.setProducto(producto);
+            detalle.setProductoId(productoId);
             detalle.setCantidad(detalleDto.getCantidad());
             detalle.setOrdenDespacho(ordenActual);
             nuevosDetalles.add(detalle);
 
-            stockDomainService.retirarStockDistribuido(producto, detalleDto.getCantidad());
+            stockDomainService.retirarStockDistribuido(productoId, detalleDto.getCantidad());
         }
 
         ordenActual.getDetalleDespacho().addAll(nuevosDetalles);
@@ -154,7 +159,7 @@ public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, L
                 .orElseThrow(() -> new RecursoNoEncontradoException("Orden no encontrada"));
 
         for (DetalleDespacho detalle : orden.getDetalleDespacho()) {
-            stockDomainService.ingresarStockDistribuido(detalle.getProducto(), detalle.getCantidad());
+            stockDomainService.ingresarStockDistribuido(detalle.getProductoId(), detalle.getCantidad());
         }
         ordenDespachoRepositorio.delete(orden);
     }

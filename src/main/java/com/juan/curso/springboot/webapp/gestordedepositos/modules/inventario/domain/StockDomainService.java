@@ -10,6 +10,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.persistence.InventarioRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.persistence.MovimientoInventarioRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.persistence.UbicacionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +29,44 @@ public class StockDomainService implements com.juan.curso.springboot.webapp.gest
     private final InventarioRepositorio inventarioRepositorio;
     private final UbicacionRepositorio ubicacionRepositorio;
     private final MovimientoInventarioRepositorio movimientoRepositorio;
+    private final ProductoServiceImpl productoService;
 
     public StockDomainService(InventarioRepositorio inventarioRepositorio,
                               UbicacionRepositorio ubicacionRepositorio,
-                              MovimientoInventarioRepositorio movimientoRepositorio) {
+                              MovimientoInventarioRepositorio movimientoRepositorio,
+                              ProductoServiceImpl productoService) {
         this.inventarioRepositorio = inventarioRepositorio;
         this.ubicacionRepositorio = ubicacionRepositorio;
         this.movimientoRepositorio = movimientoRepositorio;
+        this.productoService = productoService;
+    }
+
+    @Override
+    @Transactional
+    public void retirarStockDistribuido(Long productoId, int cantidadTotal) {
+        Producto producto = productoService.buscarPorId(productoId)
+                .orElseThrow(() -> new StockInsuficienteException("Producto no encontrado con ID: " + productoId));
+        retirarStockDistribuido(producto, cantidadTotal);
+    }
+
+    @Override
+    @Transactional
+    public void ingresarStockDistribuido(Long productoId, int cantidadTotal) {
+        Producto producto = productoService.buscarPorId(productoId)
+                .orElseThrow(() -> new StockInsuficienteException("Producto no encontrado con ID: " + productoId));
+        ingresarStockDistribuido(producto, cantidadTotal);
+    }
+
+    @Override
+    public int calcularStockTotal(Long productoId) {
+        Producto producto = productoService.buscarPorId(productoId)
+                .orElseThrow(() -> new StockInsuficienteException("Producto no encontrado con ID: " + productoId));
+        return calcularStockTotal(producto);
+    }
+
+    @Override
+    public boolean hayStockSuficiente(Long productoId, int cantidadSolicitada) {
+        return calcularStockTotal(productoId) >= cantidadSolicitada;
     }
 
     @Transactional

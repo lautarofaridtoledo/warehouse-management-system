@@ -2,7 +2,6 @@ package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepc
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenRecepcion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 public class OrdenRecepcionDTO {
 
     private Long id_orden_recepcion;
-    private Proveedor proveedor;
+    private Long proveedorId;
     private Date fecha;
     private EstadosDeOrden estado;
     private List<DetalleRecepcionDTO> detalleRecepcionDTOList;
@@ -29,7 +28,7 @@ public class OrdenRecepcionDTO {
         this.id_orden_recepcion = ordenRecepcion.getIdOrdenRecepcion();
         this.estado = ordenRecepcion.getEstado();
         this.fecha = ordenRecepcion.getFecha();
-        this.proveedor = ordenRecepcion.getProveedor();
+        this.proveedorId = ordenRecepcion.getProveedorId();
         List<DetalleRecepcionDTO> detalles = ordenRecepcion.getDetallesRecepcion() == null
                 ? Collections.emptyList()
                 : ordenRecepcion.getDetallesRecepcion().stream().map(DetalleRecepcionDTO::new).collect(Collectors.toList());

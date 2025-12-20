@@ -96,10 +96,11 @@ public class InventarioServiceImpl implements GenericService<Inventario, Long> {
     @Transactional
     public List<Inventario> disminuirCantidad(DetalleDespacho detalleDespacho) {
         stockDomainService.retirarStockDistribuido(
-                detalleDespacho.getProducto(),
+        productoService.buscarPorId(detalleDespacho.getProductoId())
+            .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado")),
                 detalleDespacho.getCantidad()
         );
-        return buscarInventariosPorIdProducto(detalleDespacho.getProducto().getIdProducto());
+        return buscarInventariosPorIdProducto(detalleDespacho.getProductoId());
     }
 
     @Transactional

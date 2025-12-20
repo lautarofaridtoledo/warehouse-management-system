@@ -52,4 +52,8 @@ public class ProveedorServiceImpl implements GenericService<Proveedor, Long> {
         }
         proveedorRepositorio.deleteById(id);
     }
+
+    public boolean ExistePorIdProveedor(Long id) {
+        return proveedorRepositorio.existsById(id);
+    }
 }

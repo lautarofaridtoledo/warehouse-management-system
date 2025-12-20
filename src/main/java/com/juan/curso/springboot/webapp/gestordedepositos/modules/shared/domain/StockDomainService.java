@@ -21,9 +21,17 @@ public interface StockDomainService {
 
     void retirarStockDistribuido(Producto producto, int cantidadTotal);
 
+    void retirarStockDistribuido(Long productoId, int cantidadTotal);
+
     void ingresarStockDistribuido(Producto producto, int cantidadTotal);
+
+    void ingresarStockDistribuido(Long productoId, int cantidadTotal);
 
     int calcularStockTotal(Producto producto);
 
+    int calcularStockTotal(Long productoId);
+
     boolean hayStockSuficiente(Producto producto, int cantidadSolicitada);
+
+    boolean hayStockSuficiente(Long productoId, int cantidadSolicitada);
 }

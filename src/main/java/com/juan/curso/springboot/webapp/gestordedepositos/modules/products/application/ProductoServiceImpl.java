@@ -91,4 +91,8 @@ public class ProductoServiceImpl implements GenericService<Producto, Long> {
     public Producto buscarPorCodigoSKU(String codigo) {
         return productoRepositorio.findProductoByCodigoSkuIs(codigo);
     }
+
+    public boolean ExistePorIdProducto(Long id) {
+        return productoRepositorio.existsById(id);
+    }
 }

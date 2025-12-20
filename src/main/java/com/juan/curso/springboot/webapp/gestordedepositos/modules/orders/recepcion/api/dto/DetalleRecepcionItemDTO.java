@@ -1,6 +1,5 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api.dto;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,9 +15,7 @@ public class DetalleRecepcionItemDTO {
 
     private Long idOrdenRecepcion;
 
-    private Producto producto;
-
-    private String codigoSku;
+    private Long productoId;
 
     @NotNull
     @Min(1)

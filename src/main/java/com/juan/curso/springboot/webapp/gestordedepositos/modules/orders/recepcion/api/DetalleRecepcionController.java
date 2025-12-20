@@ -6,7 +6,6 @@ import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepci
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleRecepcion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenRecepcion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.application.DetalleRecepcionServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.application.OrdenRecepcionServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;
@@ -72,22 +71,17 @@ public class DetalleRecepcionController {
         OrdenRecepcion orden = ordenRecepcionService.buscarPorId(idOrden)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Orden asociada al detalle no encontrada"));
 
-        String codigoSku = dto.getCodigoSku();
-        if (codigoSku == null && dto.getProducto() != null) {
-            codigoSku = dto.getProducto().getCodigoSku();
-        }
-        if (codigoSku == null || codigoSku.isBlank()) {
-            throw new IllegalArgumentException("Debe indicar un código SKU válido");
+        Long productoId = dto.getProductoId();
+        if (productoId == null) {
+            throw new IllegalArgumentException("Debe indicar productoId");
         }
 
-        Producto producto = productoService.buscarPorCodigoSKU(codigoSku);
-        if (producto == null) {
-            throw new RecursoNoEncontradoException("Producto no encontrado para el código SKU: " + codigoSku);
-        }
+        productoService.buscarPorId(productoId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado con ID: " + productoId));
 
         DetalleRecepcion detalleRecepcion = new DetalleRecepcion();
         detalleRecepcion.setOrdenRecepcion(orden);
-        detalleRecepcion.setProducto(producto);
+    detalleRecepcion.setProductoId(productoId);
         detalleRecepcion.setCantidad(dto.getCantidad());
 
         detalleRecepcion = detalleRecepcionService.crear(detalleRecepcion);
@@ -120,22 +114,16 @@ public class DetalleRecepcionController {
                 throw new IllegalArgumentException("Todos los detalles deben pertenecer a la misma orden");
             }
 
-            String codigoSku = item.getCodigoSku();
-            if (codigoSku == null && item.getProducto() != null) {
-                codigoSku = item.getProducto().getCodigoSku();
+            Long productoId = item.getProductoId();
+            if (productoId == null) {
+                throw new IllegalArgumentException("Debe indicar productoId");
             }
-            if (codigoSku == null || codigoSku.isBlank()) {
-                throw new IllegalArgumentException("Debe indicar un código SKU válido");
-            }
-
-            Producto producto = productoService.buscarPorCodigoSKU(codigoSku);
-            if (producto == null) {
-                throw new RecursoNoEncontradoException("Producto no encontrado para el código SKU: " + codigoSku);
-            }
+            productoService.buscarPorId(productoId)
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado con ID: " + productoId));
 
             DetalleRecepcion detalle = new DetalleRecepcion();
             detalle.setOrdenRecepcion(orden);
-            detalle.setProducto(producto);
+            detalle.setProductoId(productoId);
             detalle.setCantidad(item.getCantidad());
             detallesParaGuardar.add(detalle);
         }
@@ -157,16 +145,11 @@ public class DetalleRecepcionController {
 
         detalle.setCantidad(detalleDTO.getCantidad());
 
-        String codigoSku = detalleDTO.getCodigoSku();
-        if (codigoSku == null && detalleDTO.getProducto() != null) {
-            codigoSku = detalleDTO.getProducto().getCodigoSku();
-        }
-        if (codigoSku != null && !codigoSku.isBlank()) {
-            Producto producto = productoService.buscarPorCodigoSKU(codigoSku);
-            if (producto == null) {
-                throw new RecursoNoEncontradoException("Producto no encontrado para el código SKU: " + codigoSku);
-            }
-            detalle.setProducto(producto);
+        Long productoId = detalleDTO.getProductoId();
+        if (productoId != null) {
+            productoService.buscarPorId(productoId)
+                    .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado con ID: " + productoId));
+            detalle.setProductoId(productoId);
         }
 
         detalleRecepcionService.actualizar(detalle);

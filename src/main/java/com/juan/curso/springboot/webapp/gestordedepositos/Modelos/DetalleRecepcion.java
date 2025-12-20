@@ -25,10 +25,8 @@ public class DetalleRecepcion {
     @JsonIgnore
     private OrdenRecepcion ordenRecepcion;
 
-    @ManyToOne
-    @JoinColumn (name = "id_producto")
-    @JsonIgnore
-    private Producto producto;
+    @Column(name = "id_producto", nullable = false)
+    private Long productoId;
 
     @NotNull
     private int cantidad;

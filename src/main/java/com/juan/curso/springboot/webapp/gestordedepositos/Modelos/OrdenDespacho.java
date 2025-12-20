@@ -1,6 +1,5 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.Modelos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,12 +30,10 @@ public class OrdenDespacho {
     @Column(nullable = false)
     private EstadosDeOrden estado;
 
-    @ManyToOne
-    @JoinColumn(name = "id_cliente", nullable = false)
-    private Cliente cliente;
+    @Column(name = "id_cliente", nullable = false)
+    private Long clienteId;
 
     @OneToMany(mappedBy = "ordenDespacho", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @Column(name="detalle_despacho")
     private List<DetalleDespacho> detalleDespacho = new ArrayList<>();
 }

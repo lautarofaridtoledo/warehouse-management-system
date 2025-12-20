@@ -22,9 +22,8 @@ public class OrdenRecepcion {
     @Column(name ="id_orden_recepcion")
     private Long idOrdenRecepcion;
 
-    @ManyToOne
-    @JoinColumn (name = "id_proveedor")
-    private Proveedor proveedor;
+    @Column(name = "id_proveedor", nullable = false)
+    private Long proveedorId;
 
     private Date fecha;
 

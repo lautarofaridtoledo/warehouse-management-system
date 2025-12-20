@@ -6,8 +6,6 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoE
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleRecepcion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenRecepcion;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.persistence.OrdenRecepcionRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.domain.StockDomainService;
@@ -72,11 +70,13 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
 
     @Transactional
     public OrdenRecepcion procesarEntradaMercaderia(OrdenRecepcionDTO dto) {
-        Proveedor proveedor = proveedorService.buscarPorId(dto.getProveedor().getId_proveedor())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado"));
+        Long proveedorId = dto.getProveedorId();
+        if (proveedorId == null || !proveedorService.ExistePorIdProveedor(proveedorId)) {
+            throw new RecursoNoEncontradoException("Proveedor no encontrado");
+        }
 
         OrdenRecepcion orden = new OrdenRecepcion();
-        orden.setProveedor(proveedor);
+    orden.setProveedorId(proveedorId);
         orden.setFecha(Calendar.getInstance().getTime());
         orden.setEstado(dto.getEstado());
 
@@ -85,21 +85,17 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
         for (DetalleRecepcionDTO detalleDTO : dto.getDetalleRecepcionDTOList()) {
             DetalleRecepcion detalle = new DetalleRecepcion();
 
-            String sku = detalleDTO.getProducto().getCodigoSku();
-            Producto producto = productoService.buscarPorCodigoSKU(sku);
-
-            if (producto == null) {
-                Producto nuevo = detalleDTO.getProducto();
-                nuevo.setIsDeleted("N");
-                producto = productoService.crear(nuevo);
+            Long productoId = detalleDTO.getProductoId();
+            if (productoId == null || !productoService.ExistePorIdProducto(productoId)) {
+                throw new RecursoNoEncontradoException("Producto no encontrado");
             }
 
-            detalle.setProducto(producto);
+            detalle.setProductoId(productoId);
             detalle.setCantidad(detalleDTO.getCantidad());
             detalle.setOrdenRecepcion(orden);
             detalles.add(detalle);
 
-            stockDomainService.ingresarStockDistribuido(producto, detalleDTO.getCantidad());
+            stockDomainService.ingresarStockDistribuido(productoId, detalleDTO.getCantidad());
         }
 
         orden.setDetallesRecepcion(detalles);
@@ -117,12 +113,14 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
         }
 
         for (DetalleRecepcion detalleViejo : ordenActual.getDetallesRecepcion()) {
-            stockDomainService.retirarStockDistribuido(detalleViejo.getProducto(), detalleViejo.getCantidad());
+            stockDomainService.retirarStockDistribuido(detalleViejo.getProductoId(), detalleViejo.getCantidad());
         }
 
-        Proveedor proveedor = proveedorService.buscarPorId(dto.getProveedor().getId_proveedor())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Proveedor no encontrado"));
-        ordenActual.setProveedor(proveedor);
+        Long proveedorId = dto.getProveedorId();
+        if (proveedorId == null || !proveedorService.ExistePorIdProveedor(proveedorId)) {
+            throw new RecursoNoEncontradoException("Proveedor no encontrado");
+        }
+        ordenActual.setProveedorId(proveedorId);
         ordenActual.setFecha(dto.getFecha());
         ordenActual.setEstado(dto.getEstado());
 
@@ -133,19 +131,17 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
         for (DetalleRecepcionDTO detalleDTO : dto.getDetalleRecepcionDTOList()) {
             DetalleRecepcion detalle = new DetalleRecepcion();
 
-            Producto producto = productoService.buscarPorCodigoSKU(detalleDTO.getProducto().getCodigoSku());
-            if (producto == null) {
-                Producto nuevo = detalleDTO.getProducto();
-                nuevo.setIsDeleted("N");
-                producto = productoService.crear(nuevo);
+            Long productoId = detalleDTO.getProductoId();
+            if (productoId == null || !productoService.ExistePorIdProducto(productoId)) {
+                throw new RecursoNoEncontradoException("Producto no encontrado");
             }
 
-            detalle.setProducto(producto);
+            detalle.setProductoId(productoId);
             detalle.setCantidad(detalleDTO.getCantidad());
             detalle.setOrdenRecepcion(ordenActual);
             nuevosDetalles.add(detalle);
 
-            stockDomainService.ingresarStockDistribuido(producto, detalleDTO.getCantidad());
+            stockDomainService.ingresarStockDistribuido(productoId, detalleDTO.getCantidad());
         }
 
         ordenActual.getDetallesRecepcion().addAll(nuevosDetalles);
@@ -158,7 +154,7 @@ public class OrdenRecepcionServiceImpl implements GenericService<OrdenRecepcion,
                 .orElseThrow(() -> new RecursoNoEncontradoException("Orden no encontrada con ID: " + id));
 
         for (DetalleRecepcion detalle : orden.getDetallesRecepcion()) {
-            stockDomainService.retirarStockDistribuido(detalle.getProducto(), detalle.getCantidad());
+            stockDomainService.retirarStockDistribuido(detalle.getProductoId(), detalle.getCantidad());
         }
 
         ordenRecepcionRepositorio.delete(orden);

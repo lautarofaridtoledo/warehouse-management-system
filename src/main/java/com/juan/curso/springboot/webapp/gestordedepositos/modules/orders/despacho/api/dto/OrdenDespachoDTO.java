@@ -1,6 +1,5 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.api.dto;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Cliente;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenDespacho;
@@ -20,14 +19,14 @@ public class OrdenDespachoDTO {
     private Long idOrdenDespacho;
     private Date fechaDespacho;
     private EstadosDeOrden estado;
-    private Cliente cliente;
+    private Long clienteId;
     private List<DetalleDespacho> detalle_despacho;
 
     public OrdenDespachoDTO(OrdenDespacho ordenDespacho) {
         this.idOrdenDespacho = ordenDespacho.getIdOrdenDespacho();
         this.fechaDespacho = ordenDespacho.getFechaDespacho();
         this.estado = ordenDespacho.getEstado();
-        this.cliente = ordenDespacho.getCliente();
+        this.clienteId = ordenDespacho.getClienteId();
         this.detalle_despacho = ordenDespacho.getDetalleDespacho();
     }
 }

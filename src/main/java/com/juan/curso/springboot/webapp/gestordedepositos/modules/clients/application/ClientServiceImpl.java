@@ -68,4 +68,8 @@ public class ClientServiceImpl implements GenericService<Cliente, Long>{
             e.printStackTrace();
         }
     }
+
+    public boolean ExistePorIdCliente(Long id) {
+        return clienteRepositorio.existsById(id);
+    }
 }
