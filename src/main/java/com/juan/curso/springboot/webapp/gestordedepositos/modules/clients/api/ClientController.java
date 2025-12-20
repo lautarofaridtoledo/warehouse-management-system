@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ClienteDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.api.dto.ClienteDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Cliente;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.application.ClientServiceImpl;

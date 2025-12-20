@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.proveedores.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ProveedorDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.proveedores.api.dto.ProveedorDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.proveedores.application.ProveedorServiceImpl;

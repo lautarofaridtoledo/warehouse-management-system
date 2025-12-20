@@ -1,11 +1,11 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.api;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.Config.PasswordEncoderConfig;
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.UsuarioDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.api.dto.UsuarioDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Usuario;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.RolServiceImpl;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.application.RolServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.application.UsuarioServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;

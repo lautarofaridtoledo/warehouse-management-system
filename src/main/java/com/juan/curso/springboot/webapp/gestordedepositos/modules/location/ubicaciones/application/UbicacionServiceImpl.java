@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ReporteUbicacionDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.api.dto.ReporteUbicacionDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.CategoriasProducto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;

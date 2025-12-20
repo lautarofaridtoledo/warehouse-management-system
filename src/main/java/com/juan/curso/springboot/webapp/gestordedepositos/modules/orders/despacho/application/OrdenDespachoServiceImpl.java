@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.application;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.OrdenDespachoDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.api.dto.OrdenDespachoDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Cliente;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespacho;
@@ -8,10 +8,10 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosD
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.OrdenDespachoRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.ClienteServiceImpl;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.clients.application.ClientServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.ProductoServiceImpl;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.domain.StockDomainService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +29,12 @@ import java.util.Optional;
 public class OrdenDespachoServiceImpl implements GenericService<OrdenDespacho, Long> {
 
     private final OrdenDespachoRepositorio ordenDespachoRepositorio;
-    private final ClienteServiceImpl clienteService;
+    private final ClientServiceImpl clienteService;
     private final ProductoServiceImpl productoService;
     private final StockDomainService stockDomainService;
 
     public OrdenDespachoServiceImpl(OrdenDespachoRepositorio ordenDespachoRepositorio,
-                                    ClienteServiceImpl clienteService,
+                                    ClientServiceImpl clienteService,
                                     ProductoServiceImpl productoService,
                                     StockDomainService stockDomainService) {
         this.ordenDespachoRepositorio = ordenDespachoRepositorio;

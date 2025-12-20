@@ -1,12 +1,12 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ReporteUbicacionDTO;
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.UbicacionDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.api.dto.ReporteUbicacionDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.api.dto.UbicacionDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Zona;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.InventarioServiceImpl;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application.UbicacionServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.application.ZonaServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;

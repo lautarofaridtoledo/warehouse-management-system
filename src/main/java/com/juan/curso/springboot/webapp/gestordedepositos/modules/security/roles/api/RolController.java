@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.RolDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.api.dto.RolDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.roles.application.RolServiceImpl;

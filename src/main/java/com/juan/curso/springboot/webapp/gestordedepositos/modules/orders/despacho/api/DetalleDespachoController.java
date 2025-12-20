@@ -1,13 +1,13 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.DetalleDespachoDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.api.dto.DetalleDespachoDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.StockInsuficienteException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenDespacho;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.InventarioServiceImpl;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.application.DetalleDespachoServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.despacho.application.OrdenDespachoServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;

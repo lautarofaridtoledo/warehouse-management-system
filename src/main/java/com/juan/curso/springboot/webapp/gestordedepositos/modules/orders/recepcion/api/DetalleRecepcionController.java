@@ -1,8 +1,8 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.DetalleRecepcionBulkRequest;
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.DetalleRecepcionDTO;
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.DetalleRecepcionItemDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api.dto.DetalleRecepcionBulkRequest;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api.dto.DetalleRecepcionDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api.dto.DetalleRecepcionItemDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleRecepcion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenRecepcion;

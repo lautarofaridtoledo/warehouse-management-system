@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.products.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ProductoDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.api.dto.ProductoDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;

@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.OrdenRecepcionDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api.dto.OrdenRecepcionDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.OrdenRecepcion;

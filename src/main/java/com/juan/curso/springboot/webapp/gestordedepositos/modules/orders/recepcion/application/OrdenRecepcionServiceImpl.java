@@ -1,7 +1,7 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.application;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.DetalleRecepcionDTO;
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.OrdenRecepcionDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api.dto.DetalleRecepcionDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.orders.recepcion.api.dto.OrdenRecepcionDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.DetalleRecepcion;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.EstadosDeOrden;
@@ -10,8 +10,8 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Proveedor;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.OrdenRecepcionRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.ProductoServiceImpl;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.domain.StockDomainService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.proveedores.application.ProveedorServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

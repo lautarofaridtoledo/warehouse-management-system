@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.MovimientoInventarioDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.api.dto.MovimientoInventarioDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.CapacidadExcedida;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.StockInsuficienteException;

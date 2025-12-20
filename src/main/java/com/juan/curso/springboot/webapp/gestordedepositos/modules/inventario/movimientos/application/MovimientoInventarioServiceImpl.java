@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.application;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.MovimientoInventarioDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.movimientos.api.dto.MovimientoInventarioDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.MovimientoInventario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Producto;
@@ -9,7 +9,7 @@ import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.Movimient
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.ProductoRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.UbicacionRepositorio;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.domain.StockDomainService;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.domain.StockDomainService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

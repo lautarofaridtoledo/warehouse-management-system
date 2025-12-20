@@ -1,6 +1,6 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.api;
 
-import com.juan.curso.springboot.webapp.gestordedepositos.Dtos.ZonaDTO;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.api.dto.ZonaDTO;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Zona;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.application.ZonaServiceImpl;

@@ -3,7 +3,7 @@ package com.juan.curso.springboot.webapp.gestordedepositos.Config;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Rol;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Usuario;
 import com.juan.curso.springboot.webapp.gestordedepositos.Repositorios.RolRepositorio;
-import com.juan.curso.springboot.webapp.gestordedepositos.Servicios.UsuarioServiceImpl;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.security.users.application.UsuarioServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
