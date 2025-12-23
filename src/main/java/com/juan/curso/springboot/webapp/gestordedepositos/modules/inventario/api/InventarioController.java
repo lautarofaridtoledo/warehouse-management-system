@@ -1,18 +1,15 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.api;
 
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.api.dto.InventarioDTO;
-import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.CapacidadExcedida;
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Inventario;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioApplicationService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.inventario.application.InventarioServiceImpl;
-import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application.UbicacionServiceImpl;
-import com.juan.curso.springboot.webapp.gestordedepositos.modules.products.application.ProductoServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,16 +23,13 @@ import java.util.stream.Collectors;
 @RequestMapping("GestorDeDepositos/inventario")
 public class InventarioController {
 
-    private final ProductoServiceImpl productoService;
-    private final UbicacionServiceImpl ubicacionService;
     private final InventarioServiceImpl inventarioService;
+    private final InventarioApplicationService inventarioApplicationService;
 
-    public InventarioController(ProductoServiceImpl productoService,
-                                UbicacionServiceImpl ubicacionService,
-                                InventarioServiceImpl inventarioService) {
-        this.productoService = productoService;
-        this.ubicacionService = ubicacionService;
+    public InventarioController(InventarioServiceImpl inventarioService,
+                                InventarioApplicationService inventarioApplicationService) {
         this.inventarioService = inventarioService;
+        this.inventarioApplicationService = inventarioApplicationService;
     }
 
     @GetMapping("/stockTotalPorIdProducto")
@@ -92,123 +86,22 @@ public class InventarioController {
     @PostMapping("/crear")
     @Operation(summary = "Este metodo crea un inventario")
     public ResponseEntity<InventarioDTO> crear(@RequestBody InventarioDTO inventarioDTO) {
-        Inventario inventario = new Inventario();
-
-        if (inventarioDTO.getUbicacionId() == null) {
-            throw new IllegalArgumentException("Debe indicar ubicacionId");
-        }
-
-        if (inventarioDTO.getProductoId() == null) {
-            throw new IllegalArgumentException("Debe indicar productoId");
-        }
-
-        var ubicacion = ubicacionService.buscarPorId(inventarioDTO.getUbicacionId())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación no encontrada"));
-
-        int espacioDisponible = ubicacion.getCapacidadMaxima() - ubicacion.getOcupadoActual();
-        if (inventarioDTO.getCantidad() > espacioDisponible) {
-            throw new CapacidadExcedida("La ubicación no tiene capacidad suficiente. Disponible: " + espacioDisponible);
-        }
-
-    productoService.buscarPorId(inventarioDTO.getProductoId())
-        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
-
-    inventario.setUbicacionId(inventarioDTO.getUbicacionId());
-    inventario.setProductoId(inventarioDTO.getProductoId());
-        inventario.setCantidad(inventarioDTO.getCantidad());
-        inventario.setFecha_actualizacion(Calendar.getInstance().getTime());
-
-        inventario = inventarioService.crear(inventario);
-
-        ubicacion.setOcupadoActual(ubicacion.getOcupadoActual() + inventario.getCantidad());
-        ubicacionService.actualizar(ubicacion);
-
-        return new ResponseEntity<>(new InventarioDTO(inventario), HttpStatus.CREATED);
+        Inventario inventario = inventarioApplicationService.crear(inventarioDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new InventarioDTO(inventario));
     }
 
     @PutMapping("/actualizar")
     @Operation(summary = "Este metodo busca un inventario por id y lo actualiza")
     public ResponseEntity<InventarioDTO> actualizar(@RequestParam Long id,
                                                     @RequestBody InventarioDTO inventarioDTO) {
-        Inventario inventarioExistente = inventarioService.buscarPorId(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
-
-    if (inventarioDTO.getUbicacionId() == null) {
-        throw new IllegalArgumentException("Debe indicar ubicacionId");
-    }
-
-    if (inventarioDTO.getProductoId() == null) {
-        throw new IllegalArgumentException("Debe indicar productoId");
-    }
-
-    var ubicacionAnterior = ubicacionService.buscarPorId(inventarioExistente.getUbicacionId())
-        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación anterior no encontrada"));
-        int cantidadAnterior = inventarioExistente.getCantidad();
-
-    var ubicacionNueva = ubicacionService.buscarPorId(inventarioDTO.getUbicacionId())
-        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación nueva no encontrada"));
-
-    productoService.buscarPorId(inventarioDTO.getProductoId())
-        .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
-
-        int cantidadNueva = inventarioDTO.getCantidad();
-
-        // Si cambia de ubicación
-        if (!ubicacionAnterior.getIdUbicacion().equals(ubicacionNueva.getIdUbicacion())) {
-            // Restar de ubicación anterior
-            int ocupadoAnterior = Math.max(0, ubicacionAnterior.getOcupadoActual() - cantidadAnterior);
-            ubicacionAnterior.setOcupadoActual(ocupadoAnterior);
-            ubicacionService.actualizar(ubicacionAnterior);
-
-            // Validar capacidad en la nueva
-            int espacioDisponible = ubicacionNueva.getCapacidadMaxima() - ubicacionNueva.getOcupadoActual();
-            if (cantidadNueva > espacioDisponible) {
-                throw new CapacidadExcedida("La nueva ubicación no tiene capacidad suficiente");
-            }
-
-            // Sumar en la nueva
-            ubicacionNueva.setOcupadoActual(ubicacionNueva.getOcupadoActual() + cantidadNueva);
-            ubicacionService.actualizar(ubicacionNueva);
-        } else {
-            // Misma ubicación
-            int diferencia = cantidadNueva - cantidadAnterior;
-
-            if (diferencia > 0) {
-                int espacioDisponible = ubicacionNueva.getCapacidadMaxima() - ubicacionNueva.getOcupadoActual();
-                if (diferencia > espacioDisponible) {
-                    throw new CapacidadExcedida("La ubicación no tiene capacidad suficiente para aumentar esta cantidad");
-                }
-            }
-
-            ubicacionNueva.setOcupadoActual(Math.max(0, ubicacionNueva.getOcupadoActual() + diferencia));
-            ubicacionService.actualizar(ubicacionNueva);
-        }
-
-        inventarioExistente.setCantidad(cantidadNueva);
-    inventarioExistente.setUbicacionId(inventarioDTO.getUbicacionId());
-    inventarioExistente.setProductoId(inventarioDTO.getProductoId());
-        inventarioExistente.setFecha_actualizacion(Calendar.getInstance().getTime());
-
-        Inventario actualizado = inventarioService.actualizar(inventarioExistente);
-
+        Inventario actualizado = inventarioApplicationService.actualizar(id, inventarioDTO);
         return ResponseEntity.ok(new InventarioDTO(actualizado));
     }
 
     @DeleteMapping("/eliminar")
     @Operation(summary = "Este metodo elimina un inventario por su id")
     public ResponseEntity<String> eliminar(@RequestParam Long id) {
-        Inventario inventario = inventarioService.buscarPorId(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Inventario no encontrado"));
-
-    var ubicacion = ubicacionService.buscarPorId(inventario.getUbicacionId())
-        .orElseThrow(() -> new RecursoNoEncontradoException("Ubicación no encontrada"));
-
-        int nuevoOcupado = Math.max(0, ubicacion.getOcupadoActual() - inventario.getCantidad());
-        ubicacion.setOcupadoActual(nuevoOcupado);
-        ubicacionService.actualizar(ubicacion);
-
-        inventarioService.eliminar(id);
-
+        inventarioApplicationService.eliminar(id);
         return ResponseEntity.ok("Inventario eliminado con éxito");
     }
 }
