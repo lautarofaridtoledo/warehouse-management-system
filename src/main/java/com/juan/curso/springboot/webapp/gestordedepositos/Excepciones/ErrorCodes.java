@@ -36,6 +36,7 @@ public final class ErrorCodes {
 
     // --- Seguridad ---
     public static final String ACCESO_DENEGADO = "ACCESO_DENEGADO";
+    public static final String AUTENTICACION_FALLIDA = "AUTENTICACION_FALLIDA";
 
     // --- Errores genéricos ---
     public static final String ERROR_INTERNO = "ERROR_INTERNO";
@@ -47,6 +48,7 @@ public final class ErrorCodes {
     public static final String MSG_ERROR_INTERNO = "Ocurrió un error interno. Por favor, intente nuevamente.";
     public static final String MSG_ERROR_INESPERADO = "Ocurrió un error inesperado. Por favor, contacte al administrador.";
     public static final String MSG_ACCESO_DENEGADO = "No tiene permisos para realizar esta operación.";
+    public static final String MSG_AUTENTICACION_FALLIDA = "Email o contraseña incorrectos";
     
     // --- Mensajes de integridad de datos ---
     public static final String MSG_INTEGRIDAD_GENERICA = "No se puede completar la operación por restricciones de datos.";

@@ -4,7 +4,9 @@ import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubica
 import com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.RecursoNoEncontradoException;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Enums.CategoriasProducto;
 import com.juan.curso.springboot.webapp.gestordedepositos.Modelos.Ubicacion;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.application.strategy.UbicacionSelectionStrategy;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.ubicaciones.persistence.UbicacionRepositorio;
+import com.juan.curso.springboot.webapp.gestordedepositos.modules.location.zonas.application.ZonaQueryService;
 import com.juan.curso.springboot.webapp.gestordedepositos.modules.shared.application.GenericService;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +24,15 @@ import java.util.stream.Collectors;
 public class UbicacionServiceImpl implements GenericService<Ubicacion, Long> {
 
     private final UbicacionRepositorio ubicacionRepositorio;
+    private final ZonaQueryService zonaQueryService;
+    private final UbicacionSelectionStrategy ubicacionSelectionStrategy;
 
-    public UbicacionServiceImpl(UbicacionRepositorio ubicacionRepositorio) {
+    public UbicacionServiceImpl(UbicacionRepositorio ubicacionRepositorio,
+                               ZonaQueryService zonaQueryService,
+                               UbicacionSelectionStrategy ubicacionSelectionStrategy) {
         this.ubicacionRepositorio = ubicacionRepositorio;
+        this.zonaQueryService = zonaQueryService;
+        this.ubicacionSelectionStrategy = ubicacionSelectionStrategy;
     }
 
     @Override
@@ -97,19 +105,22 @@ public class UbicacionServiceImpl implements GenericService<Ubicacion, Long> {
     }
 
     public Ubicacion buscarMejorUbicacion(CategoriasProducto categoria, int cantidad) {
-    // Hard boundary: Ubicacion ya no tiene relación directa con Zona (solo zonaId),
-    // así que no podemos hacer JOIN a Zona en el repositorio.
-    // Estrategia simple: elegir entre todas las ubicaciones la que tenga espacio suficiente.
-    // (Mantiene el comportamiento funcional básico; el filtrado por categoría/zona queda como mejora futura.)
-    List<Ubicacion> candidatos = ubicacionRepositorio.findAll().stream()
-        .filter(u -> (u.getCapacidadMaxima() - u.getOcupadoActual()) >= cantidad)
-        .toList();
+        List<Long> zonaIdsValidas = zonaQueryService.findZonaIdsByCategoriaAdmitida(categoria);
+
+        List<Ubicacion> candidatos = ubicacionRepositorio.findAll().stream()
+                .filter(u -> zonaIdsValidas.contains(u.getZonaId()))
+                .filter(u -> calcularEspacioDisponible(u) >= cantidad)
+                .toList();
 
         if (candidatos.isEmpty()) {
             throw new RuntimeException("No hay espacio disponible en ninguna Zona habilitada para " + categoria);
         }
 
-        return candidatos.get(0);
+        return ubicacionSelectionStrategy.seleccionar(candidatos);
+    }
+
+    private int calcularEspacioDisponible(Ubicacion ubicacion) {
+        return ubicacion.getCapacidadMaxima() - ubicacion.getOcupadoActual();
     }
 
     public List<ReporteUbicacionDTO> obtenerEspacioDeUbicaciones() {

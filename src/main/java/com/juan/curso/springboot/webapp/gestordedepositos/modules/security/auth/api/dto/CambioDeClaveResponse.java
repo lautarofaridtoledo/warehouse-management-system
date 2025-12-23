@@ -1,6 +1,5 @@
 package com.juan.curso.springboot.webapp.gestordedepositos.modules.security.auth.api.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,11 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CambioDeClaveDTO {
-    @NotBlank
-    private String email;
-    @NotBlank
-    private String contrasenia;
-    @NotBlank
-    private String nuevaContrasenia;
+public class CambioDeClaveResponse {
+    private String message;
 }

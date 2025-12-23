@@ -4,6 +4,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,6 +24,15 @@ import static com.juan.curso.springboot.webapp.gestordedepositos.Excepciones.Err
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * Maneja credenciales inválidas de autenticación (401 Unauthorized)
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        ErrorResponse error = new ErrorResponse(AUTENTICACION_FALLIDA, MSG_AUTENTICACION_FALLIDA);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
 
     /**
      * Maneja recursos no encontrados (404 Not Found)
